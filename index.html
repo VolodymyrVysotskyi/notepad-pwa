@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vysotskyi Volodymyr - Portfolio</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Portfolio">
+  <meta name="theme-color" content="#111111">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #1a1a1a;
+      color: #e0e0e0;
+      font-family: 'Georgia', serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: #111;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    header h1 {
+      font-size: 16px;
+      font-weight: normal;
+      color: #888;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .page-info {
+      font-size: 12px;
+      color: #555;
+      min-width: 60px;
+      text-align: right;
+    }
+
+    .word-count {
+      font-size: 12px;
+      color: #555;
+    }
+
+    button {
+      background: none;
+      border: 1px solid #333;
+      color: #888;
+      padding: 5px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+
+    button:hover {
+      border-color: #666;
+      color: #ccc;
+    }
+
+    button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    button.danger:hover {
+      border-color: #c0392b;
+      color: #e74c3c;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .container {
+      flex: 1;
+      overflow: auto;
+      padding: 48px;
+    }
+
+    .content {
+      max-width: 900px;
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    .content h1 {
+      font-size: 24px;
+      font-weight: normal;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .contact {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .download-btn {
+      background: #f4c430;
+      color: #000;
+      border: none !important;
+      padding: 6px 12px !important;
+      font-size: 12px !important;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .download-btn:hover {
+      background: #e6b800;
+      border-color: #e6b800 !important;
+      color: #000 !important;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #333;
+      margin: 24px 0;
+    }
+
+    .section-title {
+      color: #888;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 32px;
+      margin-bottom: 16px;
+    }
+
+    .job {
+      margin-bottom: 24px;
+    }
+
+    .job-title {
+      font-weight: 600;
+      color: #e0e0e0;
+      margin-bottom: 4px;
+    }
+
+    .job-meta {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    a {
+      color: #f4c430;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    a:hover {
+      border-bottom-color: #f4c430;
+    }
+
+    .job-desc {
+      color: #999;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .skills-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 16px;
+    }
+
+    .skill-group h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
+    .skill-group ul {
+      list-style: none;
+    }
+
+    .skill-group li {
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 8px;
+      padding-left: 12px;
+      position: relative;
+    }
+
+    .skill-group li:before {
+      content: "−";
+      position: absolute;
+      left: 0;
+      color: #444;
+    }
+
+    .education-item {
+      margin-bottom: 16px;
+    }
+
+    .education-item strong {
+      color: #ccc;
+    }
+
+    .education-item p {
+      color: #666;
+      font-size: 13px;
+    }
+
+    .personal-list {
+      list-style: none;
+      color: #777;
+      font-size: 14px;
+    }
+
+    .personal-list li {
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 24px;
+      }
+
+      .skills-section {
+        grid-template-columns: 1fr;
+      }
+
+      .contact {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Vysotskyi Volodymyr</h1>
+  <div class="actions">
+    <span class="word-count" id="wordCount">0 words</span>
+    <div class="nav-buttons">
+      <button onclick="prevPage()" id="prevBtn">← Prev</button>
+      <span class="page-info" id="pageInfo">1 / 1</span>
+      <button onclick="nextPage()" id="nextBtn">Next →</button>
+    </div>
+    <button class="danger" onclick="clearPage()">Clear</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="content" id="editor" contenteditable="true">
+    <h1>Vysotskyi Volodymyr</h1>
+    <p class="subtitle">Research, Analytics, Strategy & Design</p>
+
+    <div class="contact">
+      <span>+380 50 370 42 15 | vysotskyivladimir@gmail.com</span>
+      <button class="download-btn" onclick="downloadPDF()">📥 Download PDF</button>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section-title">De Pracyuvav (Work Experience)</div>
+
+    <div class="job">
+      <div class="job-title">AUDAX SOLUTIONS AG</div>
+      <div class="job-meta">2024-2025 (Fintech) | <a href="https://audax-solutions.ch/" target="_blank">audax-solutions.ch</a></div>
+      <div class="job-desc">Product designer role. Development of banking services management system and business banking for Swiss market.</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title">IN1 Crypto-banking and Fast Transfers</div>
+      <div class="job-meta">2024-2025 (Fintech) | <a href="https://www.in1.io/" target="_blank">in1.io</a></div>
+      <div class="job-desc">Designer-researcher position. Market and product research, interface development, metrics analysis, process optimization.</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title"><a href="https://www.notion.so/9d4036524d0945d6939e0aa624d8180b" target="_blank">WizzPay – New experience of international transfers for India and UAE</a></div>
+      <div class="job-meta">2022-2024 (Fintech) | <a href="https://www.wizzpay.com/" target="_blank">wizzpay.com</a></div>
+      <div class="job-desc">Primary research, detailed market and competitor analysis. Built app from scratch for international transfers to MENA and India.</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title">ZSU - Website (2022)</div>
+      <div class="job-meta">Researcher role in creating government website | <a href="https://dou.ua/forums/topic/37065/" target="_blank">DOU Case</a></div>
+    </div>
+
+    <div class="job">
+      <div class="job-title"><a href="https://www.notion.so/6663933677cb4ce79e2e7738309cd197" target="_blank">Pivdenny Online – Mobile app for Pivdenny Bank</a></div>
+      <div class="job-meta">2021-2022 (Fintech) | <a href="https://bank.com.ua/pivdennyonline/" target="_blank">bank.com.ua</a></div>
+      <div class="job-desc">Market and competitor research, product testing process setup, user interviews, service research.</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title"><a href="https://www.notion.so/92a5c45615c24523be8af7deee65fe7e" target="_blank">Muscreators – First complete virtual assistant for music artists</a></div>
+      <div class="job-meta">2021 - Present | <a href="https://muscreators.com/en" target="_blank">muscreators.com</a></div>
+      <div class="job-desc">Business model and product creation. Prototype testing with user groups. Launch and first users. Product redesign and new version. Startup continues developing with UK launch.</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title">Dealoger</div>
+      <div class="job-meta">2020-2021</div>
+      <div class="job-desc">Developed marketplace with built-in business messenger and payment system. Project funding stopped.</div>
+    </div>
+
+    <div class="job">
+      <div class="job-title">Logist-pro</div>
+      <div class="job-meta">2018-2020</div>
+      <div class="job-desc">Designer/business analyst for automated logistics system for large company. Complex integrations and ecosystem products.</div>
+    </div>
+
+    <p style="color: #666; font-size: 13px;"><strong>Before:</strong> Web design, Motion, VFX, Animation, Identity, TV design.</p>
+
+    <div class="section-title">Skills</div>
+
+    <div class="skills-section">
+      <div class="skill-group">
+        <h3>Professional</h3>
+        <ul>
+          <li>Comprehensive research</li>
+          <li>Process design (offline & online)</li>
+          <li>Metrics analysis</li>
+          <li>UI/UX design</li>
+          <li>Design methodologies</li>
+          <li>Design systems</li>
+          <li>Graphic materials</li>
+          <li>Identity design</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h3>Soft Skills</h3>
+        <ul>
+          <li>English B1-B2</li>
+          <li>Communication & argumentation</li>
+          <li>Presentation</li>
+          <li>Design thinking</li>
+          <li>Abstract thinking</li>
+          <li>Analytical mindset</li>
+          <li>Critical thinking</li>
+          <li>Openness to new ideas</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title">Education</div>
+
+    <div class="education-item">
+      <strong>Projector</strong>
+      <p>UX Design (Offline course)</p>
+    </div>
+
+    <div class="education-item">
+      <strong>E5</strong>
+      <p>Business Analyst (Online course)</p>
+    </div>
+
+    <div class="education-item">
+      <strong>Coursera</strong>
+      <p>Various courses</p>
+    </div>
+
+    <div class="education-item">
+      <strong>University "Ukraine"</strong>
+      <p>Bachelor of Computer Networks and Systems</p>
+    </div>
+
+    <div class="section-title">After Work</div>
+
+    <ul class="personal-list">
+      <li>💼 Spending time with family</li>
+      <li>🎸 Working on Muscreators startup</li>
+      <li>🥁 Playing drums in a band</li>
+      <li>📊 Conducting research on commission</li>
+      <li>🎓 Discussing design with students</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  const editor = document.getElementById('editor');
+  const wordCount = document.getElementById('wordCount');
+  const pageInfo = document.getElementById('pageInfo');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  let currentPage = 1;
+  let pages = {};
+  const portfolioContent = editor.innerHTML;
+
+  // Initialize
+  loadPages();
+  loadPage(currentPage);
+  updateUI();
+
+  function loadPages() {
+    const saved = localStorage.getItem('notepad-pages');
+    if (saved) {
+      try {
+        pages = JSON.parse(saved);
+        // Ensure page 2 always has portfolio
+        if (!pages[2] || pages[2].trim() === '') {
+          pages[2] = portfolioContent;
+        }
+      } catch (e) {
+        pages = { 1: '', 2: portfolioContent };
+      }
+    } else {
+      // Initialize with blank page 1 and portfolio on page 2
+      pages = { 1: '', 2: portfolioContent };
+    }
+  }
+
+  function savePages() {
+    localStorage.setItem('notepad-pages', JSON.stringify(pages));
+  }
+
+  function loadPage(page) {
+    // Save current page and clean up empty pages (except page 1 and 2)
+    pages[currentPage] = editor.innerHTML;
+
+    // Delete empty pages (keep page 1 and 2 always)
+    Object.keys(pages).forEach(p => {
+      const pageNum = parseInt(p);
+      if (pageNum > 2 && (!pages[p] || pages[p].trim() === '')) {
+        delete pages[p];
+      }
+    });
+
+    currentPage = page;
+    editor.innerHTML = pages[currentPage] || '';
+    updateWordCount();
+  }
+
+  function updateUI() {
+    const pageNumbers = Object.keys(pages).map(Number).sort((a, b) => a - b);
+    const totalPages = pageNumbers.length;
+    pageInfo.textContent = `${currentPage} / ${totalPages}`;
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = false;
+  }
+
+  function nextPage() {
+    const pageNumbers = Object.keys(pages).map(Number).sort((a, b) => a - b);
+    const currentIdx = pageNumbers.indexOf(currentPage);
+
+    if (currentIdx < pageNumbers.length - 1) {
+      savePage();
+      loadPage(pageNumbers[currentIdx + 1]);
+      updateUI();
+      editor.focus();
+    } else {
+      // Create new page
+      const newPage = Math.max(...pageNumbers) + 1;
+      pages[newPage] = '';
+      savePage();
+      loadPage(newPage);
+      updateUI();
+      editor.focus();
+    }
+  }
+
+  function prevPage() {
+    const pageNumbers = Object.keys(pages).map(Number).sort((a, b) => a - b);
+    const currentIdx = pageNumbers.indexOf(currentPage);
+
+    if (currentIdx > 0) {
+      savePage();
+      loadPage(pageNumbers[currentIdx - 1]);
+      updateUI();
+      editor.focus();
+    }
+  }
+
+  function clearPage() {
+    if (editor.innerHTML && confirm('Clear this page?')) {
+      editor.innerHTML = '';
+      savePage();
+      updateWordCount();
+    }
+  }
+
+  function savePage() {
+    pages[currentPage] = editor.innerHTML;
+    savePages();
+  }
+
+  function updateWordCount() {
+    const text = editor.textContent.trim();
+    const words = text ? text.split(/\s+/).length : 0;
+    wordCount.textContent = words + (words === 1 ? ' word' : ' words');
+  }
+
+  function downloadPDF() {
+    alert('PDF download feature coming soon! For now, use your browser\'s Print to PDF feature (Cmd+P / Ctrl+P)');
+  }
+
+  // Auto-save as you type (debounced)
+  let autoSaveTimer;
+  editor.addEventListener('input', () => {
+    updateWordCount();
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+      savePage();
+    }, 1000);
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowRight') {
+      e.preventDefault();
+      nextPage();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowLeft') {
+      e.preventDefault();
+      prevPage();
+    }
+  });
+
+  // Touch swipe support
+  let touchStart = 0;
+  editor.addEventListener('touchstart', (e) => {
+    touchStart = e.touches[0].clientX;
+  });
+  editor.addEventListener('touchend', (e) => {
+    const touchEnd = e.changedTouches[0].clientX;
+    if (touchStart - touchEnd > 50) nextPage();
+    if (touchEnd - touchStart > 50) prevPage();
+  });
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+
+</body>
+</html>
