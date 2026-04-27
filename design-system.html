@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notepad — Design System</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #1a1a1a;
+      color: #e0e0e0;
+      font-family: 'Georgia', serif;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .frame {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 80px 48px 120px;
+    }
+
+    /* ---------- Header ---------- */
+    .page-header {
+      border-bottom: 1px solid #2a2a2a;
+      padding-bottom: 48px;
+      margin-bottom: 80px;
+    }
+
+    .page-eyebrow {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #f4c430;
+      margin-bottom: 16px;
+    }
+
+    .page-h1 {
+      font-size: 32px;
+      font-weight: normal;
+      color: #e0e0e0;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .page-lead {
+      font-size: 15px;
+      color: #999;
+      max-width: 640px;
+      margin-bottom: 24px;
+    }
+
+    .source {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: #555;
+    }
+
+    .source span { color: #f4c430; }
+
+    /* ---------- Section ---------- */
+    section { margin-bottom: 96px; }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #f4c430;
+      margin-bottom: 12px;
+    }
+
+    .h2 {
+      font-size: 22px;
+      font-weight: normal;
+      color: #e0e0e0;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .section-lead {
+      font-size: 14px;
+      color: #999;
+      max-width: 640px;
+      margin-bottom: 32px;
+    }
+
+    /* ---------- Colors ---------- */
+    .swatch-group { margin-bottom: 32px; }
+
+    .group-title {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 16px;
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chip {
+      width: 100%;
+      height: 88px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .swatch-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .swatch-name {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .swatch-hex {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: #f4c430;
+    }
+
+    .swatch-use {
+      font-size: 12px;
+      color: #777;
+      line-height: 1.5;
+    }
+
+    /* ---------- Typography ---------- */
+    .type-row {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 32px;
+      padding: 24px 0;
+      border-bottom: 1px solid #2a2a2a;
+      align-items: baseline;
+    }
+
+    .type-row:last-child { border-bottom: none; }
+
+    .type-meta {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #777;
+      letter-spacing: 0.5px;
+    }
+
+    .type-meta b { color: #ccc; font-weight: normal; }
+
+    /* Live samples mirror the live app's specs */
+    .ts-16-track  { font: 400 16px/1.2 'Georgia', serif; letter-spacing: 2px; text-transform: uppercase; color: #888; }
+    .ts-15-body   { font: 400 15px/1.8 'Georgia', serif; color: #e0e0e0; }
+    .ts-15-h3     { font: 600 15px/1.2 'Georgia', serif; letter-spacing: 0.5px; color: #e0e0e0; }
+    .ts-14        { font: 400 14px/1.5 'Georgia', serif; color: #999; }
+    .ts-13-btn    { font: 400 13px/1 'Georgia', serif; color: #888; }
+    .ts-12-meta   { font: 400 12px/1 'Georgia', serif; color: #555; }
+    .ts-11-status { font: 400 11px/1 'Georgia', serif; color: #555; }
+
+    /* ---------- Layout ---------- */
+    .layout-bar {
+      position: relative;
+      height: 80px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .layout-well {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 83.3%; /* 900/1080 ≈ 83% */
+      max-width: 900px;
+      height: 100%;
+      background: rgba(244,196,48,0.08);
+      border-left: 1px dashed rgba(244,196,48,0.3);
+      border-right: 1px dashed rgba(244,196,48,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f4c430;
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .layout-callouts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .callout {
+      padding: 16px;
+      border: 1px solid #2a2a2a;
+      border-radius: 4px;
+      background: #111;
+    }
+
+    .callout-label {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .callout-value {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 13px;
+      color: #f4c430;
+      margin-bottom: 4px;
+    }
+
+    .callout-mobile {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #666;
+    }
+
+    /* ---------- Radii ---------- */
+    .radii { display: flex; gap: 32px; align-items: flex-end; }
+
+    .radius-demo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .radius-shape {
+      width: 88px;
+      height: 56px;
+      background: #111;
+      border: 1px solid #333;
+    }
+
+    .radius-shape.r4 { border-radius: 4px; }
+    .radius-shape.r6 { border-radius: 6px; }
+
+    .radius-label {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #f4c430;
+    }
+
+    .radius-use {
+      font-size: 11px;
+      color: #777;
+    }
+
+    /* ---------- Buttons (static states) ---------- */
+    .button-grid {
+      display: grid;
+      grid-template-columns: 120px repeat(3, 1fr);
+      gap: 16px;
+      align-items: center;
+    }
+
+    .button-grid > .grid-head {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #555;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .variant-label {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .demo-cell {
+      padding: 16px;
+      background: #111;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 56px;
+    }
+
+    /* The actual button styles, copied from index.html — no :hover */
+    .btn {
+      background: none;
+      border: 1px solid #333;
+      color: #888;
+      padding: 5px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .btn-hover { border-color: #666; color: #ccc; }
+    .btn-disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-danger-hover { border-color: #c0392b; color: #e74c3c; }
+    .btn-primary { border-color: #f4c430; color: #f4c430; }
+    .btn-primary-hover { background: #f4c430; color: #000; border-color: #f4c430; }
+
+    /* ---------- Inputs ---------- */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 120px 1fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .input-demo {
+      width: 100%;
+      background: #111;
+      border: 1px solid #333;
+      color: #e0e0e0;
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-family: 'Georgia', serif;
+      font-size: 14px;
+    }
+
+    .input-demo.focused { border-color: #f4c430; }
+
+    /* ---------- Status chips ---------- */
+    .chip-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 24px;
+      background: #111;
+      border-radius: 4px;
+      align-items: center;
+    }
+
+    .ws-word { font-size: 12px; color: #555; }
+    .ws-page { font-size: 12px; color: #555; min-width: 60px; text-align: right; }
+    .ws-sync { font-size: 11px; color: #555; }
+    .ws-sync.ok { color: #4a7c4a; }
+    .ws-sync.err { color: #c0392b; }
+    .ws-sync.pending { color: #555; }
+
+    .chip-caption {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #555;
+      display: block;
+      margin-top: 8px;
+    }
+
+    .chip-cell { display: flex; flex-direction: column; align-items: flex-start; }
+
+    /* ---------- Dialog mockup ---------- */
+    .dialog-mock {
+      background: #1f1f1f;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 24px;
+      max-width: 460px;
+      margin-bottom: 24px;
+    }
+
+    .dialog-mock h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e0e0e0;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .dialog-mock p {
+      font-size: 14px;
+      color: #999;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .dialog-mock .hint {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 8px;
+    }
+
+    .dialog-mock .hint b { color: #f4c430; font-weight: 600; }
+
+    .dialog-mock .err {
+      font-size: 12px;
+      color: #e74c3c;
+      min-height: 16px;
+      margin-bottom: 8px;
+    }
+
+    .dialog-mock-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .dialog-mock-actions .btn { flex: 1; min-width: 120px; padding: 5px 14px; }
+
+    /* ---------- Section order ---------- */
+    .pill-flow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill {
+      padding: 8px 14px;
+      border: 1px solid #333;
+      border-radius: 999px;
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: #ccc;
+      background: #111;
+    }
+
+    .pill-arrow {
+      color: #555;
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="frame">
+
+  <header class="page-header">
+    <div class="page-eyebrow">Visual reference</div>
+    <h1 class="page-h1">Notepad — Design System</h1>
+    <p class="page-lead">A one-page audit of every color, type ramp, and component used in the live app. Use it to spot drift, paste a hex to look up the token, or onboard yourself in five minutes.</p>
+    <p class="source">Source: <span>index.html</span> · <span>design.md</span></p>
+  </header>
+
+  <section>
+    <div class="eyebrow">01 — Color</div>
+    <h2 class="h2">Color tokens</h2>
+    <p class="section-lead">Three surface tones, a six-step muted text ramp, two rule weights, and gold as the only action color. Status reds and one sync-ok green round out the palette.</p>
+
+    <div class="swatch-group">
+      <div class="group-title">Surfaces</div>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="chip" style="background:#1a1a1a; border-color:#333"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">surface/body</div>
+            <div class="swatch-hex">#1a1a1a</div>
+          </div>
+          <div class="swatch-use">Page background</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#111111"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">surface/raised</div>
+            <div class="swatch-hex">#111111</div>
+          </div>
+          <div class="swatch-use">Header bar, dialog input</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#1f1f1f"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">surface/dialog</div>
+            <div class="swatch-hex">#1f1f1f</div>
+          </div>
+          <div class="swatch-use">Modal dialog body</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="swatch-group">
+      <div class="group-title">Text ramp</div>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="chip" style="background:#e0e0e0"></div>
+          <div class="swatch-meta"><div class="swatch-name">text/primary</div><div class="swatch-hex">#e0e0e0</div></div>
+          <div class="swatch-use">Editor body, dialog heading, input value</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#cccccc"></div>
+          <div class="swatch-meta"><div class="swatch-name">text/hover</div><div class="swatch-hex">#cccccc</div></div>
+          <div class="swatch-use">Button label on hover</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#999999"></div>
+          <div class="swatch-meta"><div class="swatch-name">text/secondary</div><div class="swatch-hex">#999999</div></div>
+          <div class="swatch-use">Dialog body paragraph</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#888888"></div>
+          <div class="swatch-meta"><div class="swatch-name">text/muted</div><div class="swatch-hex">#888888</div></div>
+          <div class="swatch-use">Header H1, default button label</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#777777"></div>
+          <div class="swatch-meta"><div class="swatch-name">text/hint</div><div class="swatch-hex">#777777</div></div>
+          <div class="swatch-use">Dialog hint line</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#666666"></div>
+          <div class="swatch-meta"><div class="swatch-name">text/border-hover</div><div class="swatch-hex">#666666</div></div>
+          <div class="swatch-use">Button border on hover</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#555555"></div>
+          <div class="swatch-meta"><div class="swatch-name">text/meta</div><div class="swatch-hex">#555555</div></div>
+          <div class="swatch-use">Word count, page nav, sync status</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="swatch-group">
+      <div class="group-title">Rules</div>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="chip" style="background:#333333"></div>
+          <div class="swatch-meta"><div class="swatch-name">rule/default</div><div class="swatch-hex">#333333</div></div>
+          <div class="swatch-use">Buttons, dialogs, inputs</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#2a2a2a"></div>
+          <div class="swatch-meta"><div class="swatch-name">rule/header</div><div class="swatch-hex">#2a2a2a</div></div>
+          <div class="swatch-use">Header bottom edge</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="swatch-group">
+      <div class="group-title">Accent</div>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="chip" style="background:#f4c430"></div>
+          <div class="swatch-meta"><div class="swatch-name">accent/gold</div><div class="swatch-hex">#f4c430</div></div>
+          <div class="swatch-use">Primary action, focus, link, hint emphasis</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#000000; border-color:#333"></div>
+          <div class="swatch-meta"><div class="swatch-name">accent/on-gold</div><div class="swatch-hex">#000000</div></div>
+          <div class="swatch-use">Text on a filled gold surface</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="swatch-group">
+      <div class="group-title">Status</div>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="chip" style="background:#c0392b"></div>
+          <div class="swatch-meta"><div class="swatch-name">status/danger-edge</div><div class="swatch-hex">#c0392b</div></div>
+          <div class="swatch-use">Danger button border on hover</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#e74c3c"></div>
+          <div class="swatch-meta"><div class="swatch-name">status/danger</div><div class="swatch-hex">#e74c3c</div></div>
+          <div class="swatch-use">Danger button label, dialog error</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background:#4a7c4a"></div>
+          <div class="swatch-meta"><div class="swatch-name">status/ok</div><div class="swatch-hex">#4a7c4a</div></div>
+          <div class="swatch-use">Sync status when last write succeeded</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">02 — Type</div>
+    <h2 class="h2">Typography</h2>
+    <p class="section-lead">One family — Georgia. Seven roles, distinguished by size, weight, and the one tracked-uppercase treatment used for the header logo.</p>
+
+    <div class="type-row">
+      <div class="ts-16-track">Notepad</div>
+      <div class="type-meta"><b>16px</b> · 400 · track 2px · UPPERCASE</div>
+    </div>
+    <div class="type-row">
+      <div class="ts-15-body">The quick brown fox jumps over the lazy dog. Editor body text, comfortable for long reading sessions.</div>
+      <div class="type-meta"><b>15px</b> · 400 · line-height 1.8</div>
+    </div>
+    <div class="type-row">
+      <div class="ts-15-h3">Sign in or create</div>
+      <div class="type-meta"><b>15px</b> · 600 · track 0.5px</div>
+    </div>
+    <div class="type-row">
+      <div class="ts-14">Enter your phrase to sync notes across devices.</div>
+      <div class="type-meta"><b>14px</b> · 400 · line-height 1.5</div>
+    </div>
+    <div class="type-row">
+      <div class="ts-13-btn">Sign in</div>
+      <div class="type-meta"><b>13px</b> · 400 · button label</div>
+    </div>
+    <div class="type-row">
+      <div class="ts-12-meta">142 words</div>
+      <div class="type-meta"><b>12px</b> · 400 · word count, page nav, hint, error</div>
+    </div>
+    <div class="type-row">
+      <div class="ts-11-status">Synced</div>
+      <div class="type-meta"><b>11px</b> · 400 · sync status only</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">03 — Layout</div>
+    <h2 class="h2">Layout & spacing</h2>
+    <p class="section-lead">A 900px max-width content well, generous container padding, and a single mobile breakpoint at 768px that compacts the chrome.</p>
+
+    <div class="layout-bar">
+      <div class="layout-well">900px content well</div>
+    </div>
+    <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; color:#555; margin-bottom:32px;">Container max width is implicit — the editor caps at 900px regardless of viewport.</div>
+
+    <div class="layout-callouts">
+      <div class="callout">
+        <div class="callout-label">Header padding</div>
+        <div class="callout-value">14px 24px</div>
+        <div class="callout-mobile">mobile · 10px 14px</div>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Container padding</div>
+        <div class="callout-value">48px</div>
+        <div class="callout-mobile">mobile · 24px</div>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Action cluster gap</div>
+        <div class="callout-value">10px</div>
+        <div class="callout-mobile">mobile · 6px</div>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Dialog padding</div>
+        <div class="callout-value">24px</div>
+        <div class="callout-mobile">mobile · unchanged</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">04 — Radius</div>
+    <h2 class="h2">Border radius</h2>
+    <p class="section-lead">Two values. Controls and inputs share the smaller; dialogs use the larger so they read as a distinct surface.</p>
+
+    <div class="radii">
+      <div class="radius-demo">
+        <div class="radius-shape r4"></div>
+        <div class="radius-label">4px</div>
+        <div class="radius-use">Buttons, dialog input</div>
+      </div>
+      <div class="radius-demo">
+        <div class="radius-shape r6"></div>
+        <div class="radius-label">6px</div>
+        <div class="radius-use">Dialog body</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">05 — Buttons</div>
+    <h2 class="h2">Buttons</h2>
+    <p class="section-lead">Five variants × three states. Hover renders as a sibling cell so you can compare states side by side without chasing the mouse.</p>
+
+    <div class="button-grid">
+      <div class="grid-head"></div>
+      <div class="grid-head">Default</div>
+      <div class="grid-head">Hover</div>
+      <div class="grid-head">Disabled</div>
+
+      <div class="variant-label">default</div>
+      <div class="demo-cell"><button class="btn">Sign in</button></div>
+      <div class="demo-cell"><button class="btn btn-hover">Sign in</button></div>
+      <div class="demo-cell"><button class="btn btn-disabled">Sign in</button></div>
+
+      <div class="variant-label">prev / next</div>
+      <div class="demo-cell"><button class="btn">← Prev</button></div>
+      <div class="demo-cell"><button class="btn btn-hover">← Prev</button></div>
+      <div class="demo-cell"><button class="btn btn-disabled">← Prev</button></div>
+
+      <div class="variant-label">danger</div>
+      <div class="demo-cell"><button class="btn">Clear</button></div>
+      <div class="demo-cell"><button class="btn btn-danger-hover">Clear</button></div>
+      <div class="demo-cell"><button class="btn btn-disabled">Clear</button></div>
+
+      <div class="variant-label">primary</div>
+      <div class="demo-cell"><button class="btn btn-primary">Sign in / Create</button></div>
+      <div class="demo-cell"><button class="btn btn-primary btn-primary-hover">Sign in / Create</button></div>
+      <div class="demo-cell"><button class="btn btn-primary btn-disabled">Sign in / Create</button></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">06 — Inputs</div>
+    <h2 class="h2">Text input</h2>
+    <p class="section-lead">Used only inside dialogs. The gold focus border is the single focus indicator on the page; no other element gets one.</p>
+
+    <div class="input-grid">
+      <div class="grid-head"></div>
+      <div class="grid-head">Default</div>
+      <div class="grid-head">Focused</div>
+
+      <div class="variant-label">phrase input</div>
+      <div class="demo-cell"><input type="text" class="input-demo" placeholder="four random words…"></div>
+      <div class="demo-cell"><input type="text" class="input-demo focused" value="correct horse battery staple"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">07 — Status chips</div>
+    <h2 class="h2">Status chips</h2>
+    <p class="section-lead">Inline text in the header right cluster. Sync status flips color based on cloud-write state; it's hidden on mobile.</p>
+
+    <div class="chip-row">
+      <div class="chip-cell"><span class="ws-word">142 words</span><span class="chip-caption">word count</span></div>
+      <div class="chip-cell"><span class="ws-page">3 / 5</span><span class="chip-caption">page nav</span></div>
+      <div class="chip-cell"><span class="ws-sync pending">Saving…</span><span class="chip-caption">sync · pending</span></div>
+      <div class="chip-cell"><span class="ws-sync ok">Synced</span><span class="chip-caption">sync · ok</span></div>
+      <div class="chip-cell"><span class="ws-sync err">Network error</span><span class="chip-caption">sync · error</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">08 — Dialogs</div>
+    <h2 class="h2">Dialogs</h2>
+    <p class="section-lead">Two modal shapes used in the app, rendered with their actual content. The dialog body anatomy: heading → paragraph → input → hint → error → actions row.</p>
+
+    <div class="dialog-mock">
+      <h3>Sign in or create</h3>
+      <p>Enter your phrase to sync notes across devices. First time using this phrase creates a new account; same phrase on another device unlocks the same notes.</p>
+      <input type="text" class="input-demo" value="four random words" style="margin: 8px 0 4px;">
+      <p class="hint">At least 4 words OR 24 characters. <b>Write it down — there is no recovery.</b></p>
+      <p class="err">This phrase is already in use by another notepad.</p>
+      <div class="dialog-mock-actions">
+        <button class="btn">Cancel</button>
+        <button class="btn btn-primary">Sign in / Create</button>
+      </div>
+    </div>
+
+    <div class="dialog-mock">
+      <h3>You have notes here and in the cloud</h3>
+      <p>Notes on this device differ from your cloud notes. How would you like to combine them?</p>
+      <div class="dialog-mock-actions">
+        <button class="btn">Keep cloud only</button>
+        <button class="btn">Keep local only</button>
+        <button class="btn btn-primary">Merge both</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">09 — Composition</div>
+    <h2 class="h2">Section order</h2>
+    <p class="section-lead">The live page renders in this order, top to bottom.</p>
+
+    <div class="pill-flow">
+      <span class="pill">Header</span>
+      <span class="pill-arrow">→</span>
+      <span class="pill">Container</span>
+      <span class="pill-arrow">→</span>
+      <span class="pill">Editor</span>
+      <span class="pill-arrow">→</span>
+      <span class="pill">Auth dialog (lazy)</span>
+      <span class="pill-arrow">→</span>
+      <span class="pill">Merge dialog (lazy)</span>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
