@@ -4,6 +4,12 @@ Notable changes to the notepad. Newest first.
 
 ---
 
+## 2026-04-27 — Phrase screen stuck after entry (v4)
+
+- **Bug:** entering a phrase ran the unlock flow successfully, but the homepage overlay never disappeared. Cause was a CSS specificity tie: `.phrase-screen { display: flex }` (specificity 0,0,1,0) and the UA `[hidden] { display: none }` (also 0,0,1,0) collide, and author CSS wins on ties — so the `hidden` attribute did nothing for this element. Added `.phrase-screen[hidden] { display: none; }` (specificity 0,0,2,0).
+- **Decrypt-fail no longer blocks entry.** A phrase whose stored ciphertext fails to decrypt (corruption or rare ID-hash collision) now silently proceeds into an empty notepad; the first save overwrites the unreadable blob. Previously this raised a user-facing error.
+- **Service worker** bumped to `notepad-v4` to force the fixed HTML to active PWA installs.
+
 ## 2026-04-27 — Auth replaced by client-side encryption (v3)
 
 - **Why:** the previous "phrase as fake email + Supabase password" scheme was rejected by Supabase Auth — it validates email format and the synthetic `<hash>@notepad.local` address fails. Rather than fight Supabase Auth, the auth concept is gone entirely.
