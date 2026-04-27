@@ -21,11 +21,11 @@
       padding: 80px 48px 120px;
     }
 
-    /* ---------- Header ---------- */
+    /* ---------- Page header ---------- */
     .page-header {
       border-bottom: 1px solid #2a2a2a;
-      padding-bottom: 48px;
-      margin-bottom: 80px;
+      padding-bottom: 40px;
+      margin-bottom: 48px;
     }
 
     .page-eyebrow {
@@ -48,19 +48,50 @@
       font-size: 15px;
       color: #999;
       max-width: 640px;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     .source {
       font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
       font-size: 12px;
-      color: #555;
+      color: #777;
     }
 
-    .source span { color: #f4c430; }
+    .source a { color: #f4c430; text-decoration: none; border-bottom: 1px solid transparent; }
+    .source a:hover { border-bottom-color: #f4c430; }
+
+    .doc-note {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: rgba(244,196,48,0.06);
+      border-left: 2px solid #f4c430;
+      font-size: 12px;
+      color: #999;
+      max-width: 640px;
+    }
+
+    /* ---------- TOC ---------- */
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      padding: 24px 0;
+      margin-bottom: 80px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    nav.toc a {
+      color: #888;
+      text-decoration: none;
+      font-size: 13px;
+      border-bottom: 1px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    nav.toc a:hover { color: #f4c430; border-bottom-color: #f4c430; }
 
     /* ---------- Section ---------- */
-    section { margin-bottom: 96px; }
+    section { margin-bottom: 96px; scroll-margin-top: 24px; }
 
     .eyebrow {
       font-size: 11px;
@@ -85,24 +116,49 @@
       margin-bottom: 32px;
     }
 
-    /* ---------- Colors ---------- */
-    .swatch-group { margin-bottom: 32px; }
+    .a11y-note {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #777;
+      padding: 8px 12px;
+      border-left: 2px solid #2a2a2a;
+      margin-bottom: 24px;
+      max-width: 720px;
+    }
+
+    .a11y-note strong { color: #ccc; font-weight: normal; }
+
+    /* ---------- Color ---------- */
+    .color-group {
+      margin-bottom: 56px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .color-group:last-child { border-bottom: none; padding-bottom: 0; }
 
     .group-title {
       font-size: 11px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: #888;
-      margin-bottom: 16px;
+      margin-bottom: 4px;
     }
 
-    .swatches {
+    .group-lead {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 20px;
+      max-width: 640px;
+    }
+
+    /* Surface chips (legitimately solid) */
+    .surface-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 16px;
     }
 
-    .swatch {
+    .surface {
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -135,14 +191,161 @@
 
     .swatch-use {
       font-size: 12px;
-      color: #777;
+      color: #888;
       line-height: 1.5;
+    }
+
+    /* Text colors rendered AS text */
+    .text-tokens {
+      display: grid;
+      gap: 4px;
+      padding: 32px 0;
+    }
+
+    .text-token {
+      display: grid;
+      grid-template-columns: 1fr 140px 1fr;
+      gap: 24px;
+      padding: 16px 0;
+      border-bottom: 1px solid #2a2a2a;
+      align-items: baseline;
+    }
+
+    .text-token:last-child { border-bottom: none; }
+
+    .text-token .sample {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 16px;
+    }
+
+    .text-token .hex {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: #f4c430;
+    }
+
+    .text-token .use {
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* Rules rendered as actual lines */
+    .rule-tokens { display: grid; gap: 28px; padding: 8px 0; }
+
+    .rule-token {
+      display: grid;
+      grid-template-columns: 1fr 140px 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .rule-line {
+      width: 100%;
+      height: 1px;
+    }
+
+    .rule-line.default { background: #333333; }
+    .rule-line.header  { background: #2a2a2a; }
+    .rule-line.hover   { background: #666666; }
+
+    /* Accent — gold + on-gold paired */
+    .accent-pair {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      max-width: 480px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .accent-pair .gold-block {
+      flex: 1;
+      background: #f4c430;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000000;
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .accent-pair .on-gold-block {
+      flex: 1;
+      background: #1a1a1a;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f4c430;
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .accent-meta {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 480px;
+    }
+
+    .accent-meta .swatch-meta { margin: 0; }
+
+    /* Status chips: text in color */
+    .status-tokens {
+      display: grid;
+      gap: 16px;
+      padding: 16px 0;
+    }
+
+    .status-token {
+      display: grid;
+      grid-template-columns: 220px 140px 1fr;
+      gap: 24px;
+      padding: 12px 0;
+      border-bottom: 1px solid #2a2a2a;
+      align-items: center;
+    }
+
+    .status-token:last-child { border-bottom: none; }
+
+    .status-sample {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 14px;
+    }
+
+    /* Overlay scrim demo */
+    .scrim-demo {
+      position: relative;
+      max-width: 480px;
+      height: 180px;
+      background: linear-gradient(135deg, #f4c430, #e0e0e0, #1a1a1a);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .scrim-demo .scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+    }
+
+    .scrim-demo .scrim-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e0e0e0;
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 13px;
     }
 
     /* ---------- Typography ---------- */
     .type-row {
       display: grid;
-      grid-template-columns: 1fr 220px;
+      grid-template-columns: 1fr 240px;
       gap: 32px;
       padding: 24px 0;
       border-bottom: 1px solid #2a2a2a;
@@ -154,43 +357,104 @@
     .type-meta {
       font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
       font-size: 11px;
-      color: #777;
+      color: #888;
       letter-spacing: 0.5px;
     }
 
     .type-meta b { color: #ccc; font-weight: normal; }
 
-    /* Live samples mirror the live app's specs */
     .ts-16-track  { font: 400 16px/1.2 'Georgia', serif; letter-spacing: 2px; text-transform: uppercase; color: #888; }
-    .ts-15-body   { font: 400 15px/1.8 'Georgia', serif; color: #e0e0e0; }
     .ts-15-h3     { font: 600 15px/1.2 'Georgia', serif; letter-spacing: 0.5px; color: #e0e0e0; }
+    .ts-15-body   { font: 400 15px/1.8 'Georgia', serif; color: #e0e0e0; }
     .ts-14        { font: 400 14px/1.5 'Georgia', serif; color: #999; }
     .ts-13-btn    { font: 400 13px/1 'Georgia', serif; color: #888; }
     .ts-12-meta   { font: 400 12px/1 'Georgia', serif; color: #555; }
     .ts-11-status { font: 400 11px/1 'Georgia', serif; color: #555; }
 
-    /* ---------- Layout ---------- */
-    .layout-bar {
-      position: relative;
-      height: 80px;
-      background: #111;
-      border: 1px solid #333;
-      border-radius: 4px;
-      margin-bottom: 16px;
-      overflow: hidden;
+    /* Letter-spacing demos */
+    .track-row {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 32px;
+      padding: 20px 0;
+      border-bottom: 1px solid #2a2a2a;
+      align-items: baseline;
     }
 
-    .layout-well {
+    .track-row:last-child { border-bottom: none; }
+
+    .track-sample-wide   { font: 400 16px/1.2 'Georgia', serif; letter-spacing: 2px; text-transform: uppercase; color: #e0e0e0; }
+    .track-sample-medium { font: 400 13px/1.2 'Georgia', serif; letter-spacing: 1px; text-transform: uppercase; color: #e0e0e0; }
+    .track-sample-tight  { font: 600 15px/1.2 'Georgia', serif; letter-spacing: 0.5px; color: #e0e0e0; }
+
+    /* Motion */
+    .motion-row {
+      display: grid;
+      grid-template-columns: 220px 140px 1fr;
+      gap: 24px;
+      padding: 16px 0;
+      align-items: center;
+    }
+
+    .motion-demo {
+      display: inline-block;
+      padding: 8px 16px;
+      background: none;
+      border: 1px solid #333;
+      color: #888;
+      border-radius: 4px;
+      font-family: 'Georgia', serif;
+      font-size: 13px;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+
+    .motion-demo:hover { border-color: #666; color: #ccc; }
+
+    /* ---------- Layout ---------- */
+    .shell-diagram {
+      max-width: 720px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background: #111;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .shell-header {
+      padding: 14px 24px;
+      background: #111;
+      border-bottom: 1px solid #2a2a2a;
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #888;
+      letter-spacing: 1px;
+    }
+
+    .shell-container {
+      position: relative;
+      padding: 48px;
+      background: #1a1a1a;
+      min-height: 200px;
+    }
+
+    .shell-container::before {
+      content: 'CONTAINER · padding 48px · scrolls';
       position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 83.3%; /* 900/1080 ≈ 83% */
-      max-width: 900px;
-      height: 100%;
-      background: rgba(244,196,48,0.08);
-      border-left: 1px dashed rgba(244,196,48,0.3);
-      border-right: 1px dashed rgba(244,196,48,0.3);
+      top: 8px;
+      left: 12px;
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 10px;
+      color: #555;
+      letter-spacing: 1px;
+    }
+
+    .shell-editor {
+      max-width: 540px; /* representative — actual is 900px */
+      height: 120px;
+      background: rgba(244,196,48,0.05);
+      border: 1px dashed rgba(244,196,48,0.3);
+      border-radius: 2px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -198,6 +462,13 @@
       font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
       font-size: 11px;
       letter-spacing: 1px;
+    }
+
+    .shell-caption {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 32px;
     }
 
     .layout-callouts {
@@ -230,7 +501,7 @@
     .callout-mobile {
       font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
       font-size: 11px;
-      color: #666;
+      color: #777;
     }
 
     /* ---------- Radii ---------- */
@@ -261,13 +532,13 @@
 
     .radius-use {
       font-size: 11px;
-      color: #777;
+      color: #888;
     }
 
-    /* ---------- Buttons (static states) ---------- */
+    /* ---------- Buttons (4 states) ---------- */
     .button-grid {
       display: grid;
-      grid-template-columns: 120px repeat(3, 1fr);
+      grid-template-columns: 120px repeat(4, 1fr);
       gap: 16px;
       align-items: center;
     }
@@ -277,7 +548,7 @@
       font-size: 10px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: #555;
+      color: #777;
       padding-bottom: 8px;
       border-bottom: 1px solid #2a2a2a;
     }
@@ -290,7 +561,8 @@
 
     .demo-cell {
       padding: 16px;
-      background: #111;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
       border-radius: 4px;
       display: flex;
       align-items: center;
@@ -298,7 +570,8 @@
       min-height: 56px;
     }
 
-    /* The actual button styles, copied from index.html — no :hover */
+    .demo-cell.on-dialog { background: #1f1f1f; border-color: #333; }
+
     .btn {
       background: none;
       border: 1px solid #333;
@@ -308,10 +581,12 @@
       cursor: pointer;
       font-size: 13px;
       font-family: inherit;
+      transition: all 0.15s;
     }
 
     .btn-hover { border-color: #666; color: #ccc; }
     .btn-disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-loading { opacity: 0.3; cursor: not-allowed; }
     .btn-danger-hover { border-color: #c0392b; color: #e74c3c; }
     .btn-primary { border-color: #f4c430; color: #f4c430; }
     .btn-primary-hover { background: #f4c430; color: #000; border-color: #f4c430; }
@@ -333,11 +608,12 @@
       border-radius: 4px;
       font-family: 'Georgia', serif;
       font-size: 14px;
+      outline: none;
     }
 
     .input-demo.focused { border-color: #f4c430; }
 
-    /* ---------- Status chips ---------- */
+    /* ---------- Status chip strip ---------- */
     .chip-row {
       display: flex;
       gap: 24px;
@@ -350,7 +626,7 @@
 
     .ws-word { font-size: 12px; color: #555; }
     .ws-page { font-size: 12px; color: #555; min-width: 60px; text-align: right; }
-    .ws-sync { font-size: 11px; color: #555; }
+    .ws-sync { font-size: 11px; color: #555; min-width: 70px; }
     .ws-sync.ok { color: #4a7c4a; }
     .ws-sync.err { color: #c0392b; }
     .ws-sync.pending { color: #555; }
@@ -360,7 +636,7 @@
       font-size: 10px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: #555;
+      color: #777;
       display: block;
       margin-top: 8px;
     }
@@ -368,13 +644,23 @@
     .chip-cell { display: flex; flex-direction: column; align-items: flex-start; }
 
     /* ---------- Dialog mockup ---------- */
+    .dialog-row {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .dialog-row { grid-template-columns: 1fr; }
+    }
+
     .dialog-mock {
       background: #1f1f1f;
       border: 1px solid #333;
       border-radius: 6px;
       padding: 24px;
       max-width: 460px;
-      margin-bottom: 24px;
     }
 
     .dialog-mock h3 {
@@ -416,6 +702,22 @@
 
     .dialog-mock-actions .btn { flex: 1; min-width: 120px; padding: 5px 14px; }
 
+    .anatomy {
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #888;
+      line-height: 2;
+      padding-top: 8px;
+    }
+
+    .anatomy ol { list-style: none; padding: 0; counter-reset: item; }
+    .anatomy li { counter-increment: item; }
+    .anatomy li::before {
+      content: counter(item) '. ';
+      color: #f4c430;
+      margin-right: 4px;
+    }
+
     /* ---------- Section order ---------- */
     .pill-flow {
       display: flex;
@@ -434,10 +736,31 @@
       background: #111;
     }
 
+    .pill.fixed { border-color: #f4c430; color: #f4c430; }
+    .pill.scroll { border-color: #666; color: #ccc; }
+
     .pill-arrow {
-      color: #555;
+      color: #777;
       font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
       font-size: 14px;
+    }
+
+    .pill-legend {
+      margin-top: 16px;
+      display: flex;
+      gap: 24px;
+      font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: #888;
+    }
+
+    .pill-legend .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
     }
   </style>
 </head>
@@ -449,18 +772,39 @@
     <div class="page-eyebrow">Visual reference</div>
     <h1 class="page-h1">Notepad — Design System</h1>
     <p class="page-lead">A one-page audit of every color, type ramp, and component used in the live app. Use it to spot drift, paste a hex to look up the token, or onboard yourself in five minutes.</p>
-    <p class="source">Source: <span>index.html</span> · <span>design.md</span></p>
+    <p class="source">Source: <a href="index.html">index.html</a> · <a href="design.md">design.md</a></p>
+    <div class="doc-note">
+      <strong style="color:#f4c430">Doc-page deviation:</strong> meta text on this reference page renders at <code style="color:#f4c430">#777</code> for readability. The live app uses <code style="color:#f4c430">#555</code> (see <code>text/meta</code>) where surrounding context supplies meaning. The Accessibility section explains the trade-off.
+    </div>
   </header>
 
-  <section>
+  <nav class="toc" aria-label="Sections">
+    <a href="#colors">Color</a>
+    <a href="#typography">Type</a>
+    <a href="#tracking">Tracking</a>
+    <a href="#motion">Motion</a>
+    <a href="#layout">Layout</a>
+    <a href="#radius">Radius</a>
+    <a href="#buttons">Buttons</a>
+    <a href="#inputs">Inputs</a>
+    <a href="#chips">Status chips</a>
+    <a href="#dialogs">Dialogs</a>
+    <a href="#composition">Composition</a>
+  </nav>
+
+  <main>
+
+  <!-- ============================================================== Color -->
+  <section id="colors">
     <div class="eyebrow">01 — Color</div>
     <h2 class="h2">Color tokens</h2>
-    <p class="section-lead">Three surface tones, a six-step muted text ramp, two rule weights, and gold as the only action color. Status reds and one sync-ok green round out the palette.</p>
+    <p class="section-lead">Three surface tones, a four-step text ramp, three rule weights, and gold as the only action color. Status reds, one sync-ok green, and one overlay round out the palette.</p>
 
-    <div class="swatch-group">
+    <div class="color-group">
       <div class="group-title">Surfaces</div>
-      <div class="swatches">
-        <div class="swatch">
+      <p class="group-lead">Solid fills. Each is rendered as a chip because a surface is what you see.</p>
+      <div class="surface-grid">
+        <div class="surface">
           <div class="chip" style="background:#1a1a1a; border-color:#333"></div>
           <div class="swatch-meta">
             <div class="swatch-name">surface/body</div>
@@ -468,7 +812,7 @@
           </div>
           <div class="swatch-use">Page background</div>
         </div>
-        <div class="swatch">
+        <div class="surface">
           <div class="chip" style="background:#111111"></div>
           <div class="swatch-meta">
             <div class="swatch-name">surface/raised</div>
@@ -476,7 +820,7 @@
           </div>
           <div class="swatch-use">Header bar, dialog input</div>
         </div>
-        <div class="swatch">
+        <div class="surface">
           <div class="chip" style="background:#1f1f1f"></div>
           <div class="swatch-meta">
             <div class="swatch-name">surface/dialog</div>
@@ -487,102 +831,121 @@
       </div>
     </div>
 
-    <div class="swatch-group">
-      <div class="group-title">Text ramp</div>
-      <div class="swatches">
-        <div class="swatch">
-          <div class="chip" style="background:#e0e0e0"></div>
-          <div class="swatch-meta"><div class="swatch-name">text/primary</div><div class="swatch-hex">#e0e0e0</div></div>
-          <div class="swatch-use">Editor body, dialog heading, input value</div>
+    <div class="color-group">
+      <div class="group-title">Text</div>
+      <p class="group-lead">Rendered as actual text on the body surface, in their actual color. The visual is the artifact.</p>
+      <div class="text-tokens">
+        <div class="text-token">
+          <div class="sample" style="color:#e0e0e0">text/primary</div>
+          <div class="hex">#e0e0e0</div>
+          <div class="use">Editor body, dialog heading, input value</div>
         </div>
-        <div class="swatch">
-          <div class="chip" style="background:#cccccc"></div>
-          <div class="swatch-meta"><div class="swatch-name">text/hover</div><div class="swatch-hex">#cccccc</div></div>
-          <div class="swatch-use">Button label on hover</div>
+        <div class="text-token">
+          <div class="sample" style="color:#999999">text/secondary</div>
+          <div class="hex">#999999</div>
+          <div class="use">Dialog body paragraph</div>
         </div>
-        <div class="swatch">
-          <div class="chip" style="background:#999999"></div>
-          <div class="swatch-meta"><div class="swatch-name">text/secondary</div><div class="swatch-hex">#999999</div></div>
-          <div class="swatch-use">Dialog body paragraph</div>
+        <div class="text-token">
+          <div class="sample" style="color:#888888">text/muted</div>
+          <div class="hex">#888888</div>
+          <div class="use">Header H1, default button label</div>
         </div>
-        <div class="swatch">
-          <div class="chip" style="background:#888888"></div>
-          <div class="swatch-meta"><div class="swatch-name">text/muted</div><div class="swatch-hex">#888888</div></div>
-          <div class="swatch-use">Header H1, default button label</div>
+        <div class="text-token">
+          <div class="sample" style="color:#777777">text/hint</div>
+          <div class="hex">#777777</div>
+          <div class="use">Dialog hint line, button label on hover</div>
         </div>
-        <div class="swatch">
-          <div class="chip" style="background:#777777"></div>
-          <div class="swatch-meta"><div class="swatch-name">text/hint</div><div class="swatch-hex">#777777</div></div>
-          <div class="swatch-use">Dialog hint line</div>
-        </div>
-        <div class="swatch">
-          <div class="chip" style="background:#666666"></div>
-          <div class="swatch-meta"><div class="swatch-name">text/border-hover</div><div class="swatch-hex">#666666</div></div>
-          <div class="swatch-use">Button border on hover</div>
-        </div>
-        <div class="swatch">
-          <div class="chip" style="background:#555555"></div>
-          <div class="swatch-meta"><div class="swatch-name">text/meta</div><div class="swatch-hex">#555555</div></div>
-          <div class="swatch-use">Word count, page nav, sync status</div>
+        <div class="text-token">
+          <div class="sample" style="color:#555555">text/meta</div>
+          <div class="hex">#555555</div>
+          <div class="use">Word count, page nav, sync status idle</div>
         </div>
       </div>
+      <div class="a11y-note"><strong>Accessibility:</strong> <code>text/meta #555</code> on body bg is ≈ 3.5:1 — fails WCAG AA. Live app accepts the trade-off because surrounding controls supply context.</div>
     </div>
 
-    <div class="swatch-group">
+    <div class="color-group">
       <div class="group-title">Rules</div>
-      <div class="swatches">
-        <div class="swatch">
-          <div class="chip" style="background:#333333"></div>
+      <p class="group-lead">Rendered as 1px lines because that's what they are.</p>
+      <div class="rule-tokens">
+        <div class="rule-token">
+          <div class="rule-line default"></div>
           <div class="swatch-meta"><div class="swatch-name">rule/default</div><div class="swatch-hex">#333333</div></div>
-          <div class="swatch-use">Buttons, dialogs, inputs</div>
+          <div class="swatch-use">Buttons, dialogs, dialog input</div>
         </div>
-        <div class="swatch">
-          <div class="chip" style="background:#2a2a2a"></div>
+        <div class="rule-token">
+          <div class="rule-line header"></div>
           <div class="swatch-meta"><div class="swatch-name">rule/header</div><div class="swatch-hex">#2a2a2a</div></div>
           <div class="swatch-use">Header bottom edge</div>
         </div>
+        <div class="rule-token">
+          <div class="rule-line hover"></div>
+          <div class="swatch-meta"><div class="swatch-name">rule/hover</div><div class="swatch-hex">#666666</div></div>
+          <div class="swatch-use">Button border on hover</div>
+        </div>
       </div>
     </div>
 
-    <div class="swatch-group">
+    <div class="color-group">
       <div class="group-title">Accent</div>
-      <div class="swatches">
-        <div class="swatch">
-          <div class="chip" style="background:#f4c430"></div>
-          <div class="swatch-meta"><div class="swatch-name">accent/gold</div><div class="swatch-hex">#f4c430</div></div>
+      <p class="group-lead">Gold is the only action color. <code style="color:#f4c430; font-family:monospace">accent/on-gold</code> exists only in opposition — shown paired so the relationship reads.</p>
+      <div class="accent-pair">
+        <div class="gold-block">accent/on-gold on accent/gold</div>
+        <div class="on-gold-block">accent/gold on body</div>
+      </div>
+      <div class="accent-meta">
+        <div class="swatch-meta">
+          <div class="swatch-name">accent/gold</div>
+          <div class="swatch-hex">#f4c430</div>
           <div class="swatch-use">Primary action, focus, link, hint emphasis</div>
         </div>
-        <div class="swatch">
-          <div class="chip" style="background:#000000; border-color:#333"></div>
-          <div class="swatch-meta"><div class="swatch-name">accent/on-gold</div><div class="swatch-hex">#000000</div></div>
-          <div class="swatch-use">Text on a filled gold surface</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">accent/on-gold</div>
+          <div class="swatch-hex">#000000</div>
+          <div class="swatch-use">Text on a filled gold surface (only)</div>
         </div>
       </div>
     </div>
 
-    <div class="swatch-group">
+    <div class="color-group">
       <div class="group-title">Status</div>
-      <div class="swatches">
-        <div class="swatch">
-          <div class="chip" style="background:#c0392b"></div>
+      <p class="group-lead">Each rendered as the actual UI text it produces.</p>
+      <div class="status-tokens">
+        <div class="status-token">
+          <div class="status-sample" style="color:#c0392b">Network error</div>
           <div class="swatch-meta"><div class="swatch-name">status/danger-edge</div><div class="swatch-hex">#c0392b</div></div>
-          <div class="swatch-use">Danger button border on hover</div>
+          <div class="swatch-use">Danger button border on hover, sync error</div>
         </div>
-        <div class="swatch">
-          <div class="chip" style="background:#e74c3c"></div>
+        <div class="status-token">
+          <div class="status-sample" style="color:#e74c3c">This phrase is already in use.</div>
           <div class="swatch-meta"><div class="swatch-name">status/danger</div><div class="swatch-hex">#e74c3c</div></div>
-          <div class="swatch-use">Danger button label, dialog error</div>
+          <div class="swatch-use">Danger button label, dialog error text</div>
         </div>
-        <div class="swatch">
-          <div class="chip" style="background:#4a7c4a"></div>
+        <div class="status-token">
+          <div class="status-sample" style="color:#4a7c4a">Synced</div>
           <div class="swatch-meta"><div class="swatch-name">status/ok</div><div class="swatch-hex">#4a7c4a</div></div>
           <div class="swatch-use">Sync status when last write succeeded</div>
         </div>
       </div>
     </div>
+
+    <div class="color-group">
+      <div class="group-title">Overlay</div>
+      <p class="group-lead">The single semi-transparent value in the system, used for the dialog backdrop.</p>
+      <div class="scrim-demo">
+        <div class="scrim"></div>
+        <div class="scrim-label">overlay/scrim · rgba(0,0,0,0.7)</div>
+      </div>
+      <div class="swatch-meta" style="margin-top:16px">
+        <div class="swatch-name">overlay/scrim</div>
+        <div class="swatch-hex">rgba(0,0,0,0.7)</div>
+      </div>
+      <div class="swatch-use" style="margin-top:4px">Dialog <code>::backdrop</code></div>
+    </div>
   </section>
 
-  <section>
+  <!-- =========================================================== Typography -->
+  <section id="typography">
     <div class="eyebrow">02 — Type</div>
     <h2 class="h2">Typography</h2>
     <p class="section-lead">One family — Georgia. Seven roles, distinguished by size, weight, and the one tracked-uppercase treatment used for the header logo.</p>
@@ -592,16 +955,16 @@
       <div class="type-meta"><b>16px</b> · 400 · track 2px · UPPERCASE</div>
     </div>
     <div class="type-row">
-      <div class="ts-15-body">The quick brown fox jumps over the lazy dog. Editor body text, comfortable for long reading sessions.</div>
-      <div class="type-meta"><b>15px</b> · 400 · line-height 1.8</div>
+      <div class="ts-15-h3">Sign in or create</div>
+      <div class="type-meta"><b>15px</b> · 600 · track 0.5px · dialog H3</div>
     </div>
     <div class="type-row">
-      <div class="ts-15-h3">Sign in or create</div>
-      <div class="type-meta"><b>15px</b> · 600 · track 0.5px</div>
+      <div class="ts-15-body">The quick brown fox jumps over the lazy dog. Editor body text, comfortable for long reading sessions.</div>
+      <div class="type-meta"><b>15px</b> · 400 · line-height 1.8 · editor</div>
     </div>
     <div class="type-row">
       <div class="ts-14">Enter your phrase to sync notes across devices.</div>
-      <div class="type-meta"><b>14px</b> · 400 · line-height 1.5</div>
+      <div class="type-meta"><b>14px</b> · 400 · line-height 1.5 · dialog &lt;p&gt;, dialog input</div>
     </div>
     <div class="type-row">
       <div class="ts-13-btn">Sign in</div>
@@ -609,7 +972,7 @@
     </div>
     <div class="type-row">
       <div class="ts-12-meta">142 words</div>
-      <div class="type-meta"><b>12px</b> · 400 · word count, page nav, hint, error</div>
+      <div class="type-meta"><b>12px</b> · 400 · meta, hint, error</div>
     </div>
     <div class="type-row">
       <div class="ts-11-status">Synced</div>
@@ -617,15 +980,53 @@
     </div>
   </section>
 
-  <section>
-    <div class="eyebrow">03 — Layout</div>
-    <h2 class="h2">Layout & spacing</h2>
-    <p class="section-lead">A 900px max-width content well, generous container padding, and a single mobile breakpoint at 768px that compacts the chrome.</p>
+  <!-- ============================================================ Tracking -->
+  <section id="tracking">
+    <div class="eyebrow">03 — Tracking</div>
+    <h2 class="h2">Letter-spacing tokens</h2>
+    <p class="section-lead">Three values that previously lived inline. Naming them lets us reference them in future component additions instead of re-typing magic numbers.</p>
 
-    <div class="layout-bar">
-      <div class="layout-well">900px content well</div>
+    <div class="track-row">
+      <div class="track-sample-wide">Notepad</div>
+      <div class="type-meta"><b>track/wide</b> · 2px · header H1</div>
     </div>
-    <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; color:#555; margin-bottom:32px;">Container max width is implicit — the editor caps at 900px regardless of viewport.</div>
+    <div class="track-row">
+      <div class="track-sample-medium">Notepad</div>
+      <div class="type-meta"><b>track/medium</b> · 1px · header H1 mobile</div>
+    </div>
+    <div class="track-row">
+      <div class="track-sample-tight">Sign in or create</div>
+      <div class="type-meta"><b>track/tight</b> · 0.5px · dialog H3</div>
+    </div>
+  </section>
+
+  <!-- ============================================================== Motion -->
+  <section id="motion">
+    <div class="eyebrow">04 — Motion</div>
+    <h2 class="h2">Motion</h2>
+    <p class="section-lead">A single duration. Hover the demo button to see it.</p>
+
+    <div class="motion-row">
+      <button class="motion-demo">Hover me</button>
+      <div class="swatch-meta"><div class="swatch-name">motion/quick</div><div class="swatch-hex">150ms</div></div>
+      <div class="swatch-use">Button color and border transitions</div>
+    </div>
+    <div class="a11y-note"><strong>Reduced motion:</strong> not currently honoring <code>prefers-reduced-motion</code>. Acceptable at 150ms; revisit if longer durations are added.</div>
+  </section>
+
+  <!-- ============================================================== Layout -->
+  <section id="layout">
+    <div class="eyebrow">05 — Layout</div>
+    <h2 class="h2">Layout shell &amp; spacing</h2>
+    <p class="section-lead">The body is fixed at <code style="color:#f4c430">100vh</code> with overflow hidden — the container is the scroller. This keeps the header always visible. The editor is capped at 900px regardless of viewport.</p>
+
+    <div class="shell-diagram">
+      <div class="shell-header">HEADER · padding 14px 24px · fixed</div>
+      <div class="shell-container">
+        <div class="shell-editor">EDITOR · max-width 900px</div>
+      </div>
+    </div>
+    <div class="shell-caption">body { height: 100vh; overflow: hidden; display: flex; flex-direction: column; }</div>
 
     <div class="layout-callouts">
       <div class="callout">
@@ -648,11 +1049,32 @@
         <div class="callout-value">24px</div>
         <div class="callout-mobile">mobile · unchanged</div>
       </div>
+      <div class="callout">
+        <div class="callout-label">Page nav min-width</div>
+        <div class="callout-value">60px</div>
+        <div class="callout-mobile">anti-jitter</div>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Sync chip min-width</div>
+        <div class="callout-value">70px</div>
+        <div class="callout-mobile">anti-jitter</div>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Dialog btn min-width</div>
+        <div class="callout-value">120px</div>
+        <div class="callout-mobile">equal columns</div>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Dialog error</div>
+        <div class="callout-value">min-height 16px</div>
+        <div class="callout-mobile">reserves space</div>
+      </div>
     </div>
   </section>
 
-  <section>
-    <div class="eyebrow">04 — Radius</div>
+  <!-- =============================================================== Radius -->
+  <section id="radius">
+    <div class="eyebrow">06 — Radius</div>
     <h2 class="h2">Border radius</h2>
     <p class="section-lead">Two values. Controls and inputs share the smaller; dialogs use the larger so they read as a distinct surface.</p>
 
@@ -670,114 +1092,157 @@
     </div>
   </section>
 
-  <section>
-    <div class="eyebrow">05 — Buttons</div>
+  <!-- ============================================================== Buttons -->
+  <section id="buttons">
+    <div class="eyebrow">07 — Buttons</div>
     <h2 class="h2">Buttons</h2>
-    <p class="section-lead">Five variants × three states. Hover renders as a sibling cell so you can compare states side by side without chasing the mouse.</p>
+    <p class="section-lead">Five variants × four states. Hover renders as a sibling cell so you can compare states side by side. Loading is the disabled-and-relabeled state used during async work.</p>
 
     <div class="button-grid">
       <div class="grid-head"></div>
       <div class="grid-head">Default</div>
       <div class="grid-head">Hover</div>
       <div class="grid-head">Disabled</div>
+      <div class="grid-head">Loading</div>
 
       <div class="variant-label">default</div>
       <div class="demo-cell"><button class="btn">Sign in</button></div>
       <div class="demo-cell"><button class="btn btn-hover">Sign in</button></div>
       <div class="demo-cell"><button class="btn btn-disabled">Sign in</button></div>
+      <div class="demo-cell"><button class="btn btn-loading">Working…</button></div>
 
       <div class="variant-label">prev / next</div>
       <div class="demo-cell"><button class="btn">← Prev</button></div>
       <div class="demo-cell"><button class="btn btn-hover">← Prev</button></div>
       <div class="demo-cell"><button class="btn btn-disabled">← Prev</button></div>
+      <div class="demo-cell" style="opacity:0.4"><span style="font-family:monospace; font-size:11px; color:#777">n/a</span></div>
 
       <div class="variant-label">danger</div>
       <div class="demo-cell"><button class="btn">Clear</button></div>
       <div class="demo-cell"><button class="btn btn-danger-hover">Clear</button></div>
       <div class="demo-cell"><button class="btn btn-disabled">Clear</button></div>
+      <div class="demo-cell" style="opacity:0.4"><span style="font-family:monospace; font-size:11px; color:#777">n/a</span></div>
 
       <div class="variant-label">primary</div>
-      <div class="demo-cell"><button class="btn btn-primary">Sign in / Create</button></div>
-      <div class="demo-cell"><button class="btn btn-primary btn-primary-hover">Sign in / Create</button></div>
-      <div class="demo-cell"><button class="btn btn-primary btn-disabled">Sign in / Create</button></div>
+      <div class="demo-cell on-dialog"><button class="btn btn-primary">Sign in / Create</button></div>
+      <div class="demo-cell on-dialog"><button class="btn btn-primary btn-primary-hover">Sign in / Create</button></div>
+      <div class="demo-cell on-dialog"><button class="btn btn-primary btn-disabled">Sign in / Create</button></div>
+      <div class="demo-cell on-dialog"><button class="btn btn-primary btn-loading">Working…</button></div>
     </div>
+    <div class="a11y-note" style="margin-top:24px"><strong>Accessibility:</strong> 28px tall — below 44px iOS / 48dp Material guidelines. No custom focus ring; relies on browser default outline. Documented trade-off.</div>
   </section>
 
-  <section>
-    <div class="eyebrow">06 — Inputs</div>
+  <!-- =============================================================== Inputs -->
+  <section id="inputs">
+    <div class="eyebrow">08 — Inputs</div>
     <h2 class="h2">Text input</h2>
-    <p class="section-lead">Used only inside dialogs. The gold focus border is the single focus indicator on the page; no other element gets one.</p>
+    <p class="section-lead">Used only inside dialogs. The gold focus border is the single focus indicator on the page.</p>
 
     <div class="input-grid">
-      <div class="grid-head"></div>
-      <div class="grid-head">Default</div>
-      <div class="grid-head">Focused</div>
+      <div class="grid-head" style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#777; padding-bottom:8px; border-bottom:1px solid #2a2a2a;"></div>
+      <div class="grid-head" style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#777; padding-bottom:8px; border-bottom:1px solid #2a2a2a;">Default</div>
+      <div class="grid-head" style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#777; padding-bottom:8px; border-bottom:1px solid #2a2a2a;">Focused</div>
 
       <div class="variant-label">phrase input</div>
-      <div class="demo-cell"><input type="text" class="input-demo" placeholder="four random words…"></div>
-      <div class="demo-cell"><input type="text" class="input-demo focused" value="correct horse battery staple"></div>
+      <div class="demo-cell on-dialog"><input type="text" class="input-demo" placeholder="four random words…"></div>
+      <div class="demo-cell on-dialog"><input type="text" class="input-demo focused" value="correct horse battery staple"></div>
     </div>
+    <div class="a11y-note" style="margin-top:24px"><strong>Accessibility gap:</strong> error message below the input is not programmatically associated. Add <code>aria-describedby="phraseError"</code> and <code>aria-invalid</code> when present.</div>
   </section>
 
-  <section>
-    <div class="eyebrow">07 — Status chips</div>
+  <!-- ========================================================= Status chips -->
+  <section id="chips">
+    <div class="eyebrow">09 — Status chips</div>
     <h2 class="h2">Status chips</h2>
-    <p class="section-lead">Inline text in the header right cluster. Sync status flips color based on cloud-write state; it's hidden on mobile.</p>
+    <p class="section-lead">Inline text in the header right cluster. Sync status has four states — idle and pending are visually identical but conceptually different (idle = no recent activity; pending = waiting on cloud).</p>
 
     <div class="chip-row">
       <div class="chip-cell"><span class="ws-word">142 words</span><span class="chip-caption">word count</span></div>
       <div class="chip-cell"><span class="ws-page">3 / 5</span><span class="chip-caption">page nav</span></div>
+      <div class="chip-cell"><span class="ws-sync">&nbsp;</span><span class="chip-caption">sync · idle</span></div>
       <div class="chip-cell"><span class="ws-sync pending">Saving…</span><span class="chip-caption">sync · pending</span></div>
       <div class="chip-cell"><span class="ws-sync ok">Synced</span><span class="chip-caption">sync · ok</span></div>
       <div class="chip-cell"><span class="ws-sync err">Network error</span><span class="chip-caption">sync · error</span></div>
     </div>
+    <div class="a11y-note" style="margin-top:16px"><strong>Accessibility gap:</strong> sync status changes silently. Add <code>aria-live="polite"</code> to the chip so state changes are announced.</div>
   </section>
 
-  <section>
-    <div class="eyebrow">08 — Dialogs</div>
+  <!-- ============================================================== Dialogs -->
+  <section id="dialogs">
+    <div class="eyebrow">10 — Dialogs</div>
     <h2 class="h2">Dialogs</h2>
-    <p class="section-lead">Two modal shapes used in the app, rendered with their actual content. The dialog body anatomy: heading → paragraph → input → hint → error → actions row.</p>
+    <p class="section-lead">Two modal shapes used in the app, rendered with their actual content. Anatomy of the body, top to bottom, is fixed across variants.</p>
 
-    <div class="dialog-mock">
-      <h3>Sign in or create</h3>
-      <p>Enter your phrase to sync notes across devices. First time using this phrase creates a new account; same phrase on another device unlocks the same notes.</p>
-      <input type="text" class="input-demo" value="four random words" style="margin: 8px 0 4px;">
-      <p class="hint">At least 4 words OR 24 characters. <b>Write it down — there is no recovery.</b></p>
-      <p class="err">This phrase is already in use by another notepad.</p>
-      <div class="dialog-mock-actions">
-        <button class="btn">Cancel</button>
-        <button class="btn btn-primary">Sign in / Create</button>
+    <div class="dialog-row">
+      <div class="dialog-mock">
+        <h3>Sign in or create</h3>
+        <p>Enter your phrase to sync notes across devices. First time using this phrase creates a new account; same phrase on another device unlocks the same notes.</p>
+        <input type="text" class="input-demo" value="four random words" style="margin: 8px 0 4px;">
+        <p class="hint">At least 4 words OR 24 characters. <b>Write it down — there is no recovery.</b></p>
+        <p class="err">This phrase is already in use by another notepad.</p>
+        <div class="dialog-mock-actions">
+          <button class="btn">Cancel</button>
+          <button class="btn btn-primary">Sign in / Create</button>
+        </div>
+      </div>
+      <div class="anatomy">
+        <strong style="color:#ccc; font-weight:normal">Anatomy</strong>
+        <ol>
+          <li>Heading H3 · 15/600/track 0.5</li>
+          <li>Body &lt;p&gt; · 14/400/#999</li>
+          <li>Input · margin 8px 0 4px</li>
+          <li>Hint · 12/#777, &lt;b&gt; in gold</li>
+          <li>Error · 12/#e74c3c, min-h 16px</li>
+          <li>Actions · gap 8, flex-wrap, btn flex 1 / min-w 120</li>
+        </ol>
       </div>
     </div>
 
-    <div class="dialog-mock">
-      <h3>You have notes here and in the cloud</h3>
-      <p>Notes on this device differ from your cloud notes. How would you like to combine them?</p>
-      <div class="dialog-mock-actions">
-        <button class="btn">Keep cloud only</button>
-        <button class="btn">Keep local only</button>
-        <button class="btn btn-primary">Merge both</button>
+    <div class="dialog-row" style="margin-top:32px">
+      <div class="dialog-mock">
+        <h3>You have notes here and in the cloud</h3>
+        <p>Notes on this device differ from your cloud notes. How would you like to combine them?</p>
+        <div class="dialog-mock-actions">
+          <button class="btn">Keep cloud only</button>
+          <button class="btn">Keep local only</button>
+          <button class="btn btn-primary">Merge both</button>
+        </div>
+      </div>
+      <div class="anatomy">
+        <strong style="color:#ccc; font-weight:normal">Variant: 3-button row</strong><br>
+        <span style="color:#777">No input, no hint, no error. <code>flex-wrap</code> in <code>.dialog-actions</code> means the third button drops to a second row when width is tight.</span>
       </div>
     </div>
+
+    <div class="a11y-note" style="margin-top:32px"><strong>Accessibility:</strong> native <code>&lt;dialog&gt;</code> provides focus trap, Escape-to-close, and inert background for free. Add <code>aria-labelledby</code> referencing the H3 in next markup pass.</div>
   </section>
 
-  <section>
-    <div class="eyebrow">09 — Composition</div>
-    <h2 class="h2">Section order</h2>
-    <p class="section-lead">The live page renders in this order, top to bottom.</p>
+  <!-- ========================================================== Composition -->
+  <section id="composition">
+    <div class="eyebrow">11 — Composition</div>
+    <h2 class="h2">Layout composition</h2>
+    <p class="section-lead">The live page renders in this order. Header is fixed; container scrolls; dialogs are portal-style and render only when open.</p>
 
     <div class="pill-flow">
-      <span class="pill">Header</span>
-      <span class="pill-arrow">→</span>
-      <span class="pill">Container</span>
-      <span class="pill-arrow">→</span>
-      <span class="pill">Editor</span>
-      <span class="pill-arrow">→</span>
-      <span class="pill">Auth dialog (lazy)</span>
-      <span class="pill-arrow">→</span>
-      <span class="pill">Merge dialog (lazy)</span>
+      <span class="pill fixed">Header</span>
+      <span class="pill-arrow">↓</span>
+      <span class="pill scroll">Container · scrolls</span>
+      <span class="pill-arrow">↓</span>
+      <span class="pill">Editor · max-w 900</span>
+    </div>
+    <div class="pill-flow" style="margin-top:24px">
+      <span class="pill" style="border-style:dashed">Auth dialog (lazy)</span>
+      <span class="pill" style="border-style:dashed">Merge dialog (lazy)</span>
+    </div>
+    <div class="pill-legend">
+      <span><span class="dot" style="background:#f4c430"></span>fixed</span>
+      <span><span class="dot" style="background:#666"></span>scrolls</span>
+      <span><span class="dot" style="background:#888"></span>static</span>
+      <span><span class="dot" style="background:transparent;border:1px dashed #666"></span>lazy / portal</span>
     </div>
   </section>
+
+  </main>
 
 </div>
 
