@@ -26,6 +26,81 @@
       overflow: hidden;
     }
 
+    /* ---------- Phrase screen (homepage) ---------- */
+    .phrase-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      background: #1a1a1a;
+      z-index: 10;
+    }
+
+    .phrase-title {
+      font-size: 16px;
+      font-weight: normal;
+      color: #888;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+
+    .phrase-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .phrase-input {
+      background: #111;
+      border: 1px solid #333;
+      color: #e0e0e0;
+      padding: 12px 16px;
+      border-radius: 4px;
+      font-family: 'Georgia', serif;
+      font-size: 15px;
+      outline: none;
+      width: 100%;
+    }
+
+    .phrase-input:focus { border-color: #f4c430; }
+
+    .phrase-enter {
+      background: none;
+      border: 1px solid #f4c430;
+      color: #f4c430;
+      padding: 12px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.15s;
+    }
+
+    .phrase-enter:hover {
+      background: #f4c430;
+      color: #000;
+    }
+
+    .phrase-enter:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .phrase-error {
+      color: #e74c3c;
+      font-size: 12px;
+      min-height: 16px;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* ---------- App chrome ---------- */
     header {
       display: flex;
       align-items: center;
@@ -97,16 +172,6 @@
       color: #e74c3c;
     }
 
-    button.primary {
-      border-color: #f4c430;
-      color: #f4c430;
-    }
-
-    button.primary:hover {
-      background: #f4c430;
-      color: #000;
-    }
-
     .nav-buttons {
       display: flex;
       gap: 8px;
@@ -126,114 +191,28 @@
       outline: none;
     }
 
-    dialog {
-      background: #1f1f1f;
-      color: #e0e0e0;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 24px;
-      max-width: 460px;
-      width: calc(100% - 32px);
-      font-family: inherit;
-    }
-
-    dialog::backdrop {
-      background: rgba(0, 0, 0, 0.7);
-    }
-
-    dialog h3 {
-      font-size: 15px;
-      font-weight: 600;
-      color: #e0e0e0;
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
-    }
-
-    dialog p {
-      font-size: 14px;
-      color: #999;
-      margin-bottom: 12px;
-      line-height: 1.5;
-    }
-
-    dialog .hint {
-      font-size: 12px;
-      color: #777;
-    }
-
-    dialog .hint strong {
-      color: #f4c430;
-      font-weight: 600;
-    }
-
-    dialog .error {
-      font-size: 12px;
-      color: #e74c3c;
-      min-height: 16px;
-      margin-bottom: 8px;
-    }
-
-    dialog input[type="text"] {
-      width: 100%;
-      background: #111;
-      border: 1px solid #333;
-      color: #e0e0e0;
-      padding: 10px 12px;
-      border-radius: 4px;
-      font-family: inherit;
-      font-size: 14px;
-      margin: 8px 0 4px;
-      outline: none;
-    }
-
-    dialog input[type="text"]:focus {
-      border-color: #f4c430;
-    }
-
-    .dialog-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-
-    .dialog-actions button {
-      flex: 1;
-      min-width: 120px;
-    }
-
     @media (max-width: 768px) {
-      .container {
-        padding: 24px;
-      }
-
-      header {
-        padding: 10px 14px;
-      }
-
-      header h1 {
-        font-size: 13px;
-        letter-spacing: 1px;
-      }
-
-      .actions {
-        gap: 6px;
-      }
-
-      .sync-status {
-        display: none;
-      }
-
-      button {
-        padding: 4px 10px;
-        font-size: 12px;
-      }
+      .container { padding: 24px; }
+      header { padding: 10px 14px; }
+      header h1 { font-size: 13px; letter-spacing: 1px; }
+      .actions { gap: 6px; }
+      .sync-status { display: none; }
+      button { padding: 4px 10px; font-size: 12px; }
     }
   </style>
 </head>
 <body>
 
-<header>
+<div class="phrase-screen" id="phraseScreen">
+  <div class="phrase-title">Notepad</div>
+  <form class="phrase-form" id="phraseForm" autocomplete="off">
+    <input class="phrase-input" type="password" id="phraseInput" autocomplete="off" spellcheck="false" autocapitalize="off" autofocus>
+    <button class="phrase-enter" type="submit" id="enterBtn">Enter</button>
+    <div class="phrase-error" id="phraseError"></div>
+  </form>
+</div>
+
+<header id="appHeader" hidden>
   <h1>Notepad</h1>
   <div class="actions">
     <span class="sync-status" id="syncStatus"></span>
@@ -243,141 +222,212 @@
       <span class="page-info" id="pageInfo">1 / 1</span>
       <button id="nextBtn">Next →</button>
     </div>
-    <button id="authBtn">Sign in</button>
+    <button id="lockBtn">Lock</button>
     <button class="danger" id="clearBtn">Clear</button>
   </div>
 </header>
 
-<div class="container">
+<div class="container" id="appContainer" hidden>
   <div class="content" id="editor" contenteditable="true"></div>
 </div>
-
-<dialog id="auth-dialog">
-  <form method="dialog">
-    <h3>Sign in or create</h3>
-    <p>Enter your phrase to sync notes across devices. First time using this phrase creates a new account; same phrase on another device unlocks the same notes.</p>
-    <input type="text" id="phraseInput" placeholder="four random words…" autocomplete="off" spellcheck="false" autocapitalize="off">
-    <p class="hint">At least 4 words OR 24 characters. <strong>Write it down — there is no recovery.</strong></p>
-    <p class="error" id="phraseError"></p>
-    <div class="dialog-actions">
-      <button type="button" id="phraseCancel">Cancel</button>
-      <button type="button" id="phraseSubmit" class="primary">Sign in / Create</button>
-    </div>
-  </form>
-</dialog>
-
-<dialog id="merge-dialog">
-  <form method="dialog">
-    <h3>You have notes here and in the cloud</h3>
-    <p>Notes on this device differ from your cloud notes. How would you like to combine them?</p>
-    <div class="dialog-actions">
-      <button type="button" id="mergeCloud">Keep cloud only</button>
-      <button type="button" id="mergeLocal">Keep local only</button>
-      <button type="button" id="mergeBoth" class="primary">Merge both</button>
-    </div>
-  </form>
-</dialog>
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
   import DOMPurify from 'https://esm.sh/dompurify@3';
 
-  // ---------------------------------------------------------------------------
-  // CONFIG — paste your Supabase project values here.
-  // Both are PUBLIC by design — Row Level Security enforces access.
-  // ---------------------------------------------------------------------------
+  // Public anon-key — RLS allows public access; encryption is the privacy layer.
   const SUPABASE_URL = 'https://myiwtcnbfftknjeppnmd.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_mTkd28TZMHaADZc7vEVM3Q_pyMNA72o';
-  const PASSWORD_PEPPER = 'notepad-pepper-v1';
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const supabaseConfigured =
-    !SUPABASE_URL.startsWith('__') && !SUPABASE_ANON_KEY.startsWith('__');
-  const supabase = supabaseConfigured
-    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: { persistSession: true, autoRefreshToken: true }
-      })
-    : null;
+  const KEY_SALT = 'notepad-key-v1';
+  const ID_SALT = 'notepad-id-v1';
+  const PBKDF2_ITERS = 100000;
+
+  // ---------------------------------------------------------------------------
+  // CRYPTO — AES-GCM-256 with PBKDF2-derived key. 128-bit security level.
+  // ---------------------------------------------------------------------------
+  async function deriveKey(phrase) {
+    const enc = new TextEncoder();
+    const baseKey = await crypto.subtle.importKey(
+      'raw', enc.encode(phrase), 'PBKDF2', false, ['deriveKey']
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: enc.encode(KEY_SALT),
+        iterations: PBKDF2_ITERS,
+        hash: 'SHA-256'
+      },
+      baseKey,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  async function deriveId(phrase) {
+    const buf = await crypto.subtle.digest(
+      'SHA-256',
+      new TextEncoder().encode(phrase + ID_SALT)
+    );
+    return [...new Uint8Array(buf)]
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  async function encryptJSON(cryptoKey, obj) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ciphertext = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      cryptoKey,
+      new TextEncoder().encode(JSON.stringify(obj))
+    );
+    const combined = new Uint8Array(iv.length + ciphertext.byteLength);
+    combined.set(iv, 0);
+    combined.set(new Uint8Array(ciphertext), iv.length);
+    let bin = '';
+    for (let i = 0; i < combined.length; i++) bin += String.fromCharCode(combined[i]);
+    return btoa(bin);
+  }
+
+  async function decryptJSON(cryptoKey, b64) {
+    const bin = atob(b64);
+    const combined = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) combined[i] = bin.charCodeAt(i);
+    const iv = combined.slice(0, 12);
+    const data = combined.slice(12);
+    const plaintext = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      cryptoKey,
+      data
+    );
+    return JSON.parse(new TextDecoder().decode(plaintext));
+  }
 
   // ---------------------------------------------------------------------------
   // DOM
   // ---------------------------------------------------------------------------
+  const phraseScreen = document.getElementById('phraseScreen');
+  const phraseForm = document.getElementById('phraseForm');
+  const phraseInput = document.getElementById('phraseInput');
+  const phraseError = document.getElementById('phraseError');
+  const enterBtn = document.getElementById('enterBtn');
+  const appHeader = document.getElementById('appHeader');
+  const appContainer = document.getElementById('appContainer');
   const editor = document.getElementById('editor');
   const wordCount = document.getElementById('wordCount');
   const pageInfo = document.getElementById('pageInfo');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
-  const authBtn = document.getElementById('authBtn');
+  const lockBtn = document.getElementById('lockBtn');
   const clearBtn = document.getElementById('clearBtn');
   const syncStatus = document.getElementById('syncStatus');
-
-  const authDialog = document.getElementById('auth-dialog');
-  const phraseInput = document.getElementById('phraseInput');
-  const phraseError = document.getElementById('phraseError');
-  const phraseSubmit = document.getElementById('phraseSubmit');
-  const phraseCancel = document.getElementById('phraseCancel');
-
-  const mergeDialog = document.getElementById('merge-dialog');
-  const mergeCloud = document.getElementById('mergeCloud');
-  const mergeLocal = document.getElementById('mergeLocal');
-  const mergeBoth = document.getElementById('mergeBoth');
 
   // ---------------------------------------------------------------------------
   // STATE
   // ---------------------------------------------------------------------------
-  let currentPage = 1;
+  let cryptoKey = null;
+  let phraseId = null;
   let pages = { 1: '' };
-  let session = null;
-  let userInitiatedSignin = false;
-  const pushQueue = new Map();
+  let currentPage = 1;
   let pushTimer = null;
+  let autoSaveTimer = null;
 
   // ---------------------------------------------------------------------------
-  // LOCAL PERSISTENCE
+  // LOCAL PERSISTENCE (encrypted)
   // ---------------------------------------------------------------------------
-  function loadLocal() {
+  async function saveLocal() {
+    if (!cryptoKey || !phraseId) return;
     try {
-      const saved = JSON.parse(localStorage.getItem('notepad-pages') || 'null');
-      pages = saved && typeof saved === 'object' ? saved : { 1: '' };
-    } catch {
-      pages = { 1: '' };
+      const blob = await encryptJSON(cryptoKey, { pages, currentPage });
+      localStorage.setItem('notepad-data', blob);
+      localStorage.setItem('notepad-id', phraseId);
+    } catch (e) {
+      console.error('saveLocal', e);
     }
-    if (Object.keys(pages).length === 0) pages[1] = '';
-    const last = parseInt(localStorage.getItem('notepad-last-page'), 10);
-    if (last && pages[last] !== undefined) currentPage = last;
-    else currentPage = Math.min(...Object.keys(pages).map(Number));
   }
 
-  function saveLocal() {
-    localStorage.setItem('notepad-pages', JSON.stringify(pages));
-    localStorage.setItem('notepad-last-page', String(currentPage));
+  async function loadLocal() {
+    if (!cryptoKey || !phraseId) return null;
+    if (localStorage.getItem('notepad-id') !== phraseId) return null;
+    const blob = localStorage.getItem('notepad-data');
+    if (!blob) return null;
+    try {
+      return await decryptJSON(cryptoKey, blob);
+    } catch {
+      return null;
+    }
   }
 
   function wipeLocal() {
+    localStorage.removeItem('notepad-data');
+    localStorage.removeItem('notepad-id');
+    // Clear legacy keys from earlier versions
     localStorage.removeItem('notepad-pages');
     localStorage.removeItem('notepad-last-page');
     localStorage.removeItem('notepad-dirty');
-    pages = { 1: '' };
-    currentPage = 1;
   }
 
-  function getDirty() {
+  // ---------------------------------------------------------------------------
+  // CLOUD SYNC
+  // ---------------------------------------------------------------------------
+  async function pullCloud() {
+    if (!cryptoKey || !phraseId) return null;
+    const { data, error } = await supabase
+      .from('notes')
+      .select('encrypted')
+      .eq('id', phraseId)
+      .maybeSingle();
+    if (error) {
+      setSyncStatus('error', error.message);
+      return null;
+    }
+    if (!data?.encrypted) return null;
     try {
-      return new Set(JSON.parse(localStorage.getItem('notepad-dirty') || '[]'));
+      return await decryptJSON(cryptoKey, data.encrypted);
     } catch {
-      return new Set();
+      throw new Error('decrypt-fail');
     }
   }
 
-  function setDirty(set) {
-    localStorage.setItem('notepad-dirty', JSON.stringify([...set]));
+  async function pushCloud() {
+    if (!cryptoKey || !phraseId) return;
+    setSyncStatus('pending', 'Saving…');
+    try {
+      const blob = await encryptJSON(cryptoKey, { pages, currentPage });
+      const { error } = await supabase.from('notes').upsert({
+        id: phraseId,
+        encrypted: blob,
+        updated_at: new Date().toISOString()
+      });
+      if (error) {
+        setSyncStatus('error', error.message);
+        return;
+      }
+      setSyncStatus('ok', 'Synced');
+    } catch (e) {
+      setSyncStatus('error', e.message);
+    }
   }
 
-  function markDirty(n) {
-    const d = getDirty(); d.add(n); setDirty(d);
+  function queuePush() {
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushCloud, 1000);
   }
 
-  function clearDirtyEntry(n) {
-    const d = getDirty(); d.delete(n); setDirty(d);
+  function setSyncStatus(kind, text) {
+    syncStatus.className = 'sync-status' + (kind ? ' ' + kind : '');
+    syncStatus.textContent = text || '';
+    if (kind === 'ok') {
+      const captured = text;
+      setTimeout(() => {
+        if (syncStatus.textContent === captured) {
+          syncStatus.textContent = '';
+          syncStatus.className = 'sync-status';
+        }
+      }, 1500);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -398,10 +448,7 @@
     pages[currentPage] = editor.innerHTML;
     Object.keys(pages).forEach(p => {
       const n = parseInt(p);
-      if (n > 1 && (!pages[p] || pages[p].trim() === '')) {
-        delete pages[p];
-        if (session) deletePageRemote(n);
-      }
+      if (n > 1 && (!pages[p] || pages[p].trim() === '')) delete pages[p];
     });
     currentPage = page;
     editor.innerHTML = DOMPurify.sanitize(pages[currentPage] || '');
@@ -452,10 +499,7 @@
   function savePage() {
     pages[currentPage] = editor.innerHTML;
     saveLocal();
-    if (session) {
-      markDirty(currentPage);
-      queuePush(currentPage, pages[currentPage]);
-    }
+    queuePush();
   }
 
   function updateWordCount() {
@@ -465,323 +509,87 @@
   }
 
   // ---------------------------------------------------------------------------
-  // CLOUD SYNC
+  // ENTER / LOCK
   // ---------------------------------------------------------------------------
-  async function sha256Hex(text) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
-  }
+  async function enter(phrase) {
+    phraseError.textContent = '';
+    enterBtn.disabled = true;
+    enterBtn.textContent = 'Working…';
 
-  async function phraseToCredentials(phrase) {
-    return {
-      email: (await sha256Hex(phrase)) + '@notepad.local',
-      password: await sha256Hex(phrase + PASSWORD_PEPPER)
-    };
-  }
+    try {
+      cryptoKey = await deriveKey(phrase);
+      phraseId = await deriveId(phrase);
 
-  function validatePhrase(phrase) {
-    const trimmed = phrase.trim();
-    const words = trimmed.split(/\s+/).filter(Boolean).length;
-    if (trimmed.length >= 24 || words >= 4) return null;
-    return 'Phrase must be at least 4 words OR 24 characters.';
-  }
+      const local = await loadLocal();
+      if (local) {
+        pages = local.pages || { 1: '' };
+        currentPage = local.currentPage || 1;
+      }
 
-  async function signInOrSignUp(phrase) {
-    const err = validatePhrase(phrase);
-    if (err) return { error: err };
-    const creds = await phraseToCredentials(phrase);
-
-    const signIn = await supabase.auth.signInWithPassword(creds);
-    if (signIn.data?.session) return { ok: true };
-
-    if (signIn.error && /invalid|credentials/i.test(signIn.error.message)) {
-      const proceed = confirm(
-        'No notepad found for that phrase.\n\nCreate a new notepad with this phrase?\n\n' +
-        'IMPORTANT: write the phrase down. There is no way to recover it.'
-      );
-      if (!proceed) return { error: 'Cancelled.' };
-
-      const signUp = await supabase.auth.signUp(creds);
-      if (signUp.error) {
-        if (/already|registered|exists/i.test(signUp.error.message)) {
-          return { error: 'This phrase is already in use by another notepad. Please pick a different phrase.' };
+      let cloud = null;
+      try {
+        cloud = await pullCloud();
+      } catch (e) {
+        if (e.message === 'decrypt-fail') {
+          throw new Error("Couldn't unlock these notes — phrase doesn't match the stored content.");
         }
-        return { error: signUp.error.message };
+        // Network/permission errors fall through; we still allow local-only use.
       }
-      if (signUp.data?.session) return { ok: true };
-      const retry = await supabase.auth.signInWithPassword(creds);
-      if (retry.data?.session) return { ok: true };
-      return { error: retry.error?.message || 'Account created, but signin failed. Try again.' };
-    }
 
-    return { error: signIn.error?.message || 'Could not sign in.' };
-  }
-
-  async function pullPages() {
-    if (!session) return null;
-    const { data, error } = await supabase
-      .from('pages')
-      .select('page_number, content')
-      .eq('user_id', session.user.id)
-      .order('page_number');
-    if (error) {
-      setSyncStatus('error', error.message);
-      return null;
-    }
-    const cloud = {};
-    for (const row of data || []) cloud[row.page_number] = row.content || '';
-    return cloud;
-  }
-
-  async function pushPage(pageNumber, content) {
-    if (!session) return false;
-    const { error } = await supabase.from('pages').upsert(
-      {
-        user_id: session.user.id,
-        page_number: pageNumber,
-        content,
-        updated_at: new Date().toISOString()
-      },
-      { onConflict: 'user_id,page_number' }
-    );
-    if (error) {
-      setSyncStatus('error', error.message);
-      return false;
-    }
-    clearDirtyEntry(pageNumber);
-    setSyncStatus('ok', 'Synced');
-    return true;
-  }
-
-  async function deletePageRemote(pageNumber) {
-    if (!session) return;
-    await supabase.from('pages')
-      .delete()
-      .eq('user_id', session.user.id)
-      .eq('page_number', pageNumber);
-  }
-
-  function queuePush(pageNumber, content) {
-    pushQueue.set(pageNumber, content);
-    setSyncStatus('pending', 'Saving…');
-    clearTimeout(pushTimer);
-    pushTimer = setTimeout(flushQueue, 1000);
-  }
-
-  async function flushQueue() {
-    if (!session) { pushQueue.clear(); return; }
-    const items = [...pushQueue.entries()];
-    pushQueue.clear();
-    for (const [n, c] of items) await pushPage(n, c);
-  }
-
-  async function pushDirty() {
-    if (!session) return;
-    const dirty = getDirty();
-    for (const n of dirty) {
-      if (pages[n] !== undefined) await pushPage(n, pages[n]);
-    }
-  }
-
-  async function pushAllPages() {
-    if (!session) return;
-    for (const [n, c] of Object.entries(pages)) {
-      await pushPage(parseInt(n), c);
-    }
-  }
-
-  function isEffectivelyEmpty(p) {
-    return Object.values(p).every(v => !v || v.trim() === '');
-  }
-
-  function pagesAreEqual(a, b) {
-    const norm = o => Object.fromEntries(
-      Object.entries(o).filter(([, v]) => v && v.trim() !== '')
-    );
-    const an = norm(a), bn = norm(b);
-    const ak = Object.keys(an), bk = Object.keys(bn);
-    if (ak.length !== bk.length) return false;
-    for (const k of ak) if (an[k] !== bn[k]) return false;
-    return true;
-  }
-
-  function showMergeDialog() {
-    return new Promise(resolve => {
-      const handler = choice => () => {
-        mergeDialog.close();
-        mergeCloud.removeEventListener('click', handlers.cloud);
-        mergeLocal.removeEventListener('click', handlers.local);
-        mergeBoth.removeEventListener('click', handlers.both);
-        resolve(choice);
-      };
-      const handlers = {
-        cloud: handler('cloud'),
-        local: handler('local'),
-        both: handler('both')
-      };
-      mergeCloud.addEventListener('click', handlers.cloud);
-      mergeLocal.addEventListener('click', handlers.local);
-      mergeBoth.addEventListener('click', handlers.both);
-      mergeDialog.showModal();
-    });
-  }
-
-  async function syncOnSignin() {
-    const cloud = await pullPages();
-    if (!cloud) return;
-
-    const local = { ...pages };
-    const cloudEmpty = isEffectivelyEmpty(cloud);
-    const localEmpty = isEffectivelyEmpty(local);
-
-    if (cloudEmpty && localEmpty) return;
-
-    if (cloudEmpty && !localEmpty) {
-      await pushAllPages();
-      return;
-    }
-
-    if (!cloudEmpty && localEmpty) {
-      pages = cloud;
-      if (Object.keys(pages).length === 0) pages[1] = '';
-      saveLocal();
-      return;
-    }
-
-    if (pagesAreEqual(local, cloud)) {
-      pages = cloud;
-      saveLocal();
-      return;
-    }
-
-    const choice = await showMergeDialog();
-    if (choice === 'cloud') {
-      pages = cloud;
-      saveLocal();
-    } else if (choice === 'local') {
-      await supabase.from('pages').delete().eq('user_id', session.user.id);
-      await pushAllPages();
-    } else {
-      const cloudMax = Math.max(0, ...Object.keys(cloud).map(Number));
-      const merged = { ...cloud };
-      let nextNum = cloudMax + 1;
-      for (const k of Object.keys(local).sort((a, b) => Number(a) - Number(b))) {
-        const c = local[k];
-        if (!c || c.trim() === '') continue;
-        if (Object.values(cloud).includes(c)) continue;
-        merged[nextNum++] = c;
+      if (cloud) {
+        pages = cloud.pages || { 1: '' };
+        currentPage = cloud.currentPage || 1;
+        await saveLocal();
+      } else if (!local) {
+        pages = { 1: '' };
+        currentPage = 1;
+        await saveLocal();
       }
-      pages = merged;
-      saveLocal();
-      await pushAllPages();
+
+      phraseScreen.hidden = true;
+      appHeader.hidden = false;
+      appContainer.hidden = false;
+      reloadEditor();
+      editor.focus();
+    } catch (e) {
+      phraseError.textContent = e.message || 'Something went wrong. Try again.';
+      cryptoKey = null;
+      phraseId = null;
+    } finally {
+      enterBtn.disabled = false;
+      enterBtn.textContent = 'Enter';
     }
   }
 
-  async function syncOnRestore() {
-    await pushDirty();
-    const cloud = await pullPages();
-    if (cloud && !isEffectivelyEmpty(cloud)) {
-      pages = cloud;
-      if (Object.keys(pages).length === 0) pages[1] = '';
-      saveLocal();
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // AUTH UI
-  // ---------------------------------------------------------------------------
-  function updateAuthButton() {
-    if (!supabaseConfigured) {
-      authBtn.textContent = 'Sign in';
-      authBtn.disabled = true;
-      authBtn.title = 'Cloud sync not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY in index.html.';
-      return;
-    }
-    authBtn.disabled = false;
-    if (session) {
-      authBtn.textContent = 'Sign out';
-      authBtn.title = 'Signed in. Click to sign out.';
-    } else {
-      authBtn.textContent = 'Sign in';
-      authBtn.title = 'Sign in with a phrase to sync across devices.';
-    }
-  }
-
-  function setSyncStatus(kind, text) {
-    syncStatus.className = 'sync-status' + (kind ? ' ' + kind : '');
-    syncStatus.textContent = text || '';
-    if (kind === 'ok') {
-      setTimeout(() => {
-        if (syncStatus.textContent === text) {
-          syncStatus.textContent = '';
-          syncStatus.className = 'sync-status';
-        }
-      }, 1500);
-    }
-  }
-
-  async function openAuth() {
-    if (!supabaseConfigured) {
-      alert('Cloud sync is not configured yet.\n\nEdit index.html and replace SUPABASE_URL and SUPABASE_ANON_KEY with your project values.');
-      return;
-    }
-    if (session) {
-      if (confirm('Sign out? Your local notes on this device will be cleared.')) {
-        await supabase.auth.signOut();
-        wipeLocal();
-        reloadEditor();
-        setSyncStatus('', '');
-      }
-      return;
-    }
+  function lock() {
+    if (cryptoKey) savePage();
+    cryptoKey = null;
+    phraseId = null;
+    pages = { 1: '' };
+    currentPage = 1;
+    appHeader.hidden = true;
+    appContainer.hidden = true;
+    phraseScreen.hidden = false;
     phraseInput.value = '';
     phraseError.textContent = '';
-    authDialog.showModal();
     setTimeout(() => phraseInput.focus(), 0);
   }
 
   // ---------------------------------------------------------------------------
-  // BOOT
+  // WIRING
   // ---------------------------------------------------------------------------
-  loadLocal();
-  reloadEditor();
-  updateAuthButton();
+  phraseForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const phrase = phraseInput.value;
+    if (!phrase) return;
+    enter(phrase);
+  });
 
   prevBtn.addEventListener('click', prevPage);
   nextBtn.addEventListener('click', nextPage);
   clearBtn.addEventListener('click', clearPage);
-  authBtn.addEventListener('click', openAuth);
+  lockBtn.addEventListener('click', lock);
 
-  phraseSubmit.addEventListener('click', async (e) => {
-    e.preventDefault();
-    phraseError.textContent = '';
-    const phrase = phraseInput.value.trim();
-    if (!phrase) { phraseError.textContent = 'Please enter a phrase.'; return; }
-    phraseSubmit.disabled = true;
-    const oldText = phraseSubmit.textContent;
-    phraseSubmit.textContent = 'Working…';
-    userInitiatedSignin = true;
-    const result = await signInOrSignUp(phrase);
-    phraseSubmit.disabled = false;
-    phraseSubmit.textContent = oldText;
-    if (result.error) {
-      userInitiatedSignin = false;
-      phraseError.textContent = result.error;
-      return;
-    }
-    authDialog.close();
-  });
-
-  phraseCancel.addEventListener('click', e => {
-    e.preventDefault();
-    authDialog.close();
-  });
-
-  phraseInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); phraseSubmit.click(); }
-  });
-
-  let autoSaveTimer;
   editor.addEventListener('input', () => {
     updateWordCount();
     clearTimeout(autoSaveTimer);
@@ -789,6 +597,7 @@
   });
 
   document.addEventListener('keydown', e => {
+    if (!cryptoKey) return;
     if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowRight') { e.preventDefault(); nextPage(); }
     if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowLeft') { e.preventDefault(); prevPage(); }
   });
@@ -801,31 +610,10 @@
     if (end - touchStart > 50) prevPage();
   });
 
-  window.addEventListener('online', () => {
-    if (session) flushQueue().then(pushDirty);
-  });
+  window.addEventListener('online', () => { if (cryptoKey) queuePush(); });
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
-
-  if (supabase) {
-    supabase.auth.onAuthStateChange(async (event, newSession) => {
-      const wasSignedIn = !!session;
-      session = newSession;
-      updateAuthButton();
-      if (newSession && !wasSignedIn) {
-        if (userInitiatedSignin) {
-          userInitiatedSignin = false;
-          await syncOnSignin();
-        } else {
-          await syncOnRestore();
-        }
-        reloadEditor();
-      } else if (!newSession && wasSignedIn) {
-        reloadEditor();
-      }
-    });
   }
 </script>
 

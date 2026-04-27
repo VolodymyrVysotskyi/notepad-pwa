@@ -4,6 +4,16 @@ Notable changes to the notepad. Newest first.
 
 ---
 
+## 2026-04-27 — Auth replaced by client-side encryption (v3)
+
+- **Why:** the previous "phrase as fake email + Supabase password" scheme was rejected by Supabase Auth — it validates email format and the synthetic `<hash>@notepad.local` address fails. Rather than fight Supabase Auth, the auth concept is gone entirely.
+- **Homepage:** now a single password-style input + "Enter" button, centered. No phrase length validation, no sign-up vs sign-in distinction.
+- **Architecture:** the phrase derives both an identifier (`sha256(phrase + salt)`) and an AES-GCM-256 encryption key (PBKDF2 with 100k iterations). Server stores ciphertext only, keyed by the identifier. Anyone with the phrase can decrypt; nobody else can.
+- **Local cache also encrypted:** `localStorage` stores the same encrypted blob the server does, so no plaintext sits at rest anywhere.
+- **Schema migration required** in Supabase: drop the old `pages` and `settings` tables, create a single `notes` table (`id text PK, encrypted text, updated_at timestamptz`) with public RLS policy. Email-confirmation toggle is no longer relevant — Supabase Auth isn't used.
+- **Removed components:** auth dialog, merge dialog, all dialog UI. `design.md` updated to reflect the new component set; the dialog styles are kept as "reserved" for future use.
+- **Service worker** bumped to `notepad-v3` to force returning users to pick up the new HTML.
+
 ## 2026-04-27 — Design system v2 (post-audit reconciliation)
 
 - Ran `/design-critique` on the audit page and `/design-system` on spec-vs-code; reconciled findings.
