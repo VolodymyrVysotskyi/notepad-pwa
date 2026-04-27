@@ -39,6 +39,8 @@
       z-index: 10;
     }
 
+    .phrase-screen[hidden] { display: none; }
+
     .phrase-title {
       font-size: 16px;
       font-weight: normal;
@@ -529,11 +531,9 @@
       let cloud = null;
       try {
         cloud = await pullCloud();
-      } catch (e) {
-        if (e.message === 'decrypt-fail') {
-          throw new Error("Couldn't unlock these notes — phrase doesn't match the stored content.");
-        }
-        // Network/permission errors fall through; we still allow local-only use.
+      } catch {
+        // decrypt-fail or network/permission errors — proceed as fresh user;
+        // first pushCloud() will overwrite any existing blob at this id.
       }
 
       if (cloud) {
