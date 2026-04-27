@@ -4,6 +4,17 @@ Notable changes to the notepad. Newest first.
 
 ---
 
+## 2026-04-28 — UI refresh: autosave-only, editable hint, icon chrome (v5)
+
+Builds on the cloud-only v5 (below) to refresh the post-entry chrome.
+
+- **Lock button removed.** The 1s input-debounce autosave plus the awaited `pushCloud()` flush already covered saving — Lock was redundant. The button's other role (return to phrase screen) moves to a new switch-notepad icon below.
+- **Switch-notepad icon** added to the header (Lucide `repeat-2`) — same destination Lock used to take you to (phrase screen, ready for a different phrase) but framed as switching notepads, not locking for security. Awaits the in-flight `pushCloud()` before tearing down the in-memory key, inheriting the v5 lock-flush guarantee.
+- **Editable hint** in the header H1 — replaces the static "Notepad" word with a per-notepad clue the user writes themselves ("Alias-game" style: helps you identify which notepad you're in, but is never the phrase itself). Stored encrypted alongside `pages` in the same blob, so the cloud-only privacy model holds (the hint never appears on the phrase screen). Rendered via `textContent` (XSS-safe), single-line (Enter blurs, paste strips line breaks), 120-char cap.
+- **Clear moved off the header** onto the editor surface as a floating trash icon (Lucide `trash-2`). Top-right of `.container`, 0.4 opacity at rest, lifts to 1 on hover/focus. Confirm dialog unchanged.
+- **Iconography codified in the design system.** Cloud-only v5 introduced the eye toggle on the phrase input; this refresh extends it. Added `.icon-btn` variant (28×28 desktop / 24×24 mobile) and `.icon-btn--floating` sub-variant. `design.md`: added the Iconography component spec, the Editable hint spec, and the v5-UI-refresh removed-components note.
+- **Mobile-first polish.** `white-space: nowrap` on header chips and buttons so the action cluster doesn't wrap awkwardly at 375px. Header H1 truncates at `40vw` on mobile.
+
 ## 2026-04-27 — Cloud-only architecture (v5)
 
 - **Removed all browser-side persistence.** Supabase is now the sole source of truth. The encrypted `localStorage` blob (`notepad-data`, `notepad-id`) is gone — every entry pulls from Supabase, every save pushes to Supabase. The app behaves identically across any browser cache state: fresh, stale, cleared, or incognito. Nothing is stored in the browser between sessions.

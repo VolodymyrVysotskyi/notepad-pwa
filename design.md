@@ -12,7 +12,7 @@ For a visual reference of every token and component, open `design-system.html`.
 
 Wise with a bite. Quiet menace, dry confidence. Every line is a cut — never a paragraph, never a speech. Friendly but precisely keen. Can roast the act of staring at a blank page; never the writer or what they wrote.
 
-System chrome stays terse ("Enter", "Lock", "Clear"). The persona shows up in three reserved slots: the lock-screen intro, the first-open prompt, and the empty-row ghost placeholder.
+The persona is text-led on the **lock screen** (intro line) and inside the **editor** (first-open prompt, empty-row ghost placeholder). System chrome inside the editor is icon-led; only the lock-screen "Enter" button stays a verb. The user's own editable hint sits where the static "Notepad" H1 used to.
 
 **Examples in voice:**
 - "One phrase locks everything. Forget it, the words go with it." (lock-screen intro)
@@ -28,7 +28,7 @@ System chrome stays terse ("Enter", "Lock", "Clear"). The persona shows up in th
 - No punching down — never mock the user, their topic, or their writing skill.
 - No clever-at-the-cost-of-clarity in errors. Errors are stressful; the bite softens to a nudge.
 - No motivation, no coaching, no warmth-padding. The notepad has a mouth, not a TED talk.
-- The persona never appears in system controls — buttons stay "Enter", "Lock", "Clear".
+- The persona never appears as a button label or icon tooltip. Persona is reserved for the three copy slots above.
 
 All persona copy is **static and lives in `index.html`** in a single `AI` constant. There are no LLM calls; the encryption model (nothing plaintext leaves the browser) stays intact.
 
@@ -40,7 +40,7 @@ Eight rules. Each one cuts. The voice in copy is the voice in design.
 
 1. **One job. Writing.** No settings, no themes, no toolbar, no rich text. If a feature isn't a sentence on a page, it doesn't ship.
 2. **Quiet until you act.** Gold is the only color that means *do something*. Nothing else moves, blinks, or pulses. Calm is the default state.
-3. **Words, not chrome.** No icons. Buttons are verbs ("Lock", "Clear"). Arrows are literal `←` and `→` glyphs. The page does not need a logo, a brand mark, or decoration.
+3. **Words on the lock screen. Icons in the editor.** Persona-led surfaces (lock screen, errors, ghost placeholders) stay text. Editor chrome uses icons (Lucide) — switch-notepad, trash, eye-toggle. No icons on the lock screen, no decoration anywhere.
 4. **Encryption is the privacy.** No accounts. No email. No recovery. The phrase is the key and the identifier. Lose it, lose the words. Document this; do not soften it with optimism.
 5. **One screen at a time.** Lock screen or editor — never both, never a modal between them. State transitions are visibility toggles, not animations.
 6. **No spinners. No skeletons.** "Working…" is the only loading state. If it takes long enough to need a spinner, it's a bug.
@@ -129,10 +129,10 @@ font-family: 'Georgia', serif;
 
 | Size  | Weight | Tracking      | Used for |
 |-------|--------|---------------|----------|
-| 16px  | 400    | `track/wide`, UPPERCASE | Header H1 ("Notepad"), phrase title |
+| 16px  | 400    | `track/wide`, UPPERCASE | Header H1 (editable hint), phrase title |
 | 15px  | 400    | —             | Editor body, phrase input |
 | 14px  | 400    | —             | Enter button |
-| 13px  | 400    | —             | Header buttons (Prev / Next / Lock / Clear) |
+| 13px  | 400    | —             | Header buttons (Prev / Next) |
 | 12px  | 400    | —             | Word count, page nav, phrase error |
 | 11px  | 400    | —             | Sync status |
 
@@ -261,34 +261,79 @@ Padding `12px 16px` (slightly larger than dialog inputs were), font 15px Georgia
 
 ### Header
 
-Logo (H1) on the left, action cluster on the right. Single bottom border (`rule/header`) is the only divider on the page. Hidden on the phrase screen — appears once a phrase is entered.
+Editable hint (H1) on the left, action cluster on the right. Single bottom border (`rule/header`) is the only divider on the page. Hidden on the phrase screen — appears once a phrase is entered.
 
-**States:** none — the header is static.
+The action cluster, left to right: sync status → word count → nav-buttons (Prev / page-info / Next) → switch-notepad icon.
+
+**States:** none — the header is static. (The H1 itself is interactive; see "Editable hint".)
 
 **Accessibility:**
 - Implicit `banner` landmark from `<header>`.
 - Should be wrapped by `<main>` for the editor below — not currently the case in `index.html`. Track for next markup change.
 
+### Editable hint
+
+Replaces the static "Notepad" H1 in the header. A user-set, per-notepad clue ("Alias-game" style — a hint that helps the user identify which notepad they're in, never the phrase itself).
+
+Rendered as `<h1 contenteditable="plaintext-only" spellcheck="false" data-placeholder="hint…">`. Inherits all H1 typography (16px / `track/wide` / UPPERCASE / `text/muted`) so the visual position is unchanged from earlier versions.
+
+| State | Visual |
+|-------|--------|
+| Empty | `:empty::before` renders `data-placeholder` ("hint…") in `text/meta`, italic, lowercased (no uppercase transform, no letter-spacing). |
+| Filled | The hint text in normal H1 styling. |
+| Hover / Focus | Subtle `surface/body` background tint behind the H1 — signals the affordance without a visible border. |
+
+Behavior:
+- Single-line. Enter key blurs (does not insert a newline). Paste strips `\r\n`.
+- Hard length cap: 120 chars (enforced on save).
+- Stored encrypted with the rest of the notepad blob (`{ pages, currentPage, hint }`) — never plaintext at rest. Never appears on the phrase screen for privacy.
+- Renders via `textContent` (XSS-safe); never round-tripped as HTML.
+- Edits autosave on the same 1s debounce as editor input.
+
+Anti-jitter min-width `80px` and `max-width: 50vw` (`40vw` on mobile) with ellipsis overflow.
+
 ### Button
 
-Five variants. Four states per variant (default / hover / disabled / loading).
+Six variants. Four states per variant (default / hover / disabled / loading).
 
 | Variant | Default | Hover | Notes |
 |---------|---------|-------|-------|
-| `default` | border `rule/default` · color `text/muted` · bg transparent | border `rule/hover` · color `#cccccc` | Used for Prev / Next / Lock. The base. |
+| `default` | border `rule/default` · color `text/muted` · bg transparent | border `rule/hover` · color `#cccccc` | Used for Prev / Next. The base. |
 | `disabled` | as default + `opacity: 0.3` + `cursor: not-allowed` | (no hover) | Used for Prev when at first page. |
 | `loading` | as `disabled` + label swaps to "Working…" | (no hover) | Used for the Enter button while async work runs. |
-| `danger` | inherits `default` | border `status/danger-edge` · color `status/danger` | Used for Clear. Hover-only red. |
+| `danger` | inherits `default` | border `status/danger-edge` · color `status/danger` | Hover-only red. Modifier; combine with `default` or `icon`. |
 | `primary` | border `accent/gold` · color `accent/gold` · bg transparent | bg `accent/gold` · color `accent/on-gold` | Used for the Enter button on the phrase screen. Wider padding (`12px 16px`) than header buttons. |
+| `icon` | border `rule/default` · color `text/muted` · 28×28 square · 14×14 SVG inside · `currentColor` stroke | border `rule/hover` · color `#cccccc` | Square icon-only buttons. Used for the switch-notepad icon in the header and (with `--floating` modifier + `danger`) the Clear icon over the editor surface. Mobile: 24×24 / 12×12. |
 
-Header buttons share: `border-radius: 4px`, `padding: 5px 14px`, font 13px, `transition: all motion/quick`, family inherits Georgia.
+Sub-variant: `icon-btn--floating`. Absolutely positioned inside `.container` (top-right, 16px / 8px on mobile), `opacity: 0.4` at rest → `1` on hover or focus-visible. Used only for the Clear button on the editor surface — destructive action that stays out of the way until needed.
+
+Header buttons share: `border-radius: 4px`, `padding: 5px 14px`, font 13px, `transition: all motion/quick`, family inherits Georgia, `white-space: nowrap` so labels never wrap when the actions cluster is tight on small phones.
 
 The primary Enter button uses `padding: 12px 16px` and font 14px — larger because it's the only action on its screen.
 
 **Accessibility:**
 - Touch target: 28px tall for header buttons — below 44px iOS / 48dp Material guideline. Acceptable on desktop, brittle on touch. Documented trade-off.
+- Icon-only buttons require `aria-label` and a `title` attribute (desktop tooltip). The inner `<svg>` is `aria-hidden="true" focusable="false"`.
 - Enter button is 48px tall (12+12 padding + 14 + line-height) — passes touch guidelines.
-- No custom focus ring; relies on browser default outline.
+- No custom focus ring; relies on browser default outline. Floating Clear lifts to `opacity: 1` on `:focus-visible`.
+
+### Iconography
+
+First introduced in v5 (eye toggle on the phrase input) and expanded in the v5 UI refresh (switch-notepad, clear).
+
+- **Format:** inline SVG only. No icon font, no sprite sheet (the app is a single HTML file; runtime fetches are off-budget).
+- **Style:** Lucide line set (MIT-licensed). 24×24 viewBox, `stroke-width: 2`, round caps and joins, `currentColor` stroke. Sized to 14×14 desktop / 12×12 mobile by `.icon-btn svg`.
+- **Color:** inherits from the parent button (default `text/muted`, hover `#cccccc`, danger hover `status/danger`).
+
+Catalog:
+
+| Icon | Lucide name | Used for |
+|------|-------------|----------|
+| Eye / eye-slash | `eye` / `eye-off` (custom inline) | Phrase-input visibility toggle on the phrase screen. |
+| Switch arrows (loop) | `repeat-2` | Switch notepad — header icon button. Returns to phrase screen after flushing the latest edit. |
+| Trash | `trash-2` | Clear page — floating icon over editor surface. |
+
+Add icons sparingly; each new one is a small but real cost to the system's calm. Prefer text in the phrase screen and sync chip; reserve icons for actions that live on top of the writing surface.
 
 ### Status chips
 
@@ -322,6 +367,8 @@ The writing area. `contenteditable`, `max-width: 900px`, `font-size: 15px`, `lin
 | Focused | `outline: none` — visually identical to default. Cursor is the focus indicator. |
 | Empty (current line) | AI ghost placeholder — see below. |
 
+The floating Clear icon sits over the surface at top-right of `.container` (NOT `.content`), so it stays at a fixed screen position and doesn't scroll with content. It is a child of `.container`; `.container` carries `position: relative` to anchor it.
+
 **Accessibility:**
 - `contenteditable="true"` is announced as "edit text" by most screen readers.
 - HTML is run through DOMPurify on read, so paste-injected scripts are stripped before rendering.
@@ -346,6 +393,11 @@ A faint italic prompt in the persona's voice that appears on the **current empty
 - An unfocused, wholly-empty editor still shows the prompt (so the user sees the AI's question before clicking in).
 
 ---
+
+## Removed in v5 UI refresh
+
+- **Lock button** — removed. Saving is fully covered by the 1s input-debounce autosave plus an awaited `pushCloud()` flush on Switch. The button's other job (return to phrase screen) is now the **switch-notepad** icon button — same destination, different framing.
+- **Text "Clear" button in the header** — replaced by the floating trash icon over the editor surface. The destructive action no longer competes for header space; it sits where the destruction happens.
 
 ## Removed in v3 (formerly documented)
 
@@ -388,7 +440,6 @@ What collapses:
 
 - **Light theme** — dark-only.
 - **Loading states beyond "Working…" on Enter** — no spinners, no skeletons.
-- **Iconography** — none. Arrows in nav buttons are literal `←` and `→` glyphs.
 - **Toast / inline notifications** — sync status is the only async-feedback channel.
 - **Settings UI** — none planned.
 - **Onboarding / first-run education** — phrase screen is the first run; the AI intro line is the explanation. Anything beyond a 1–2 sentence persona line is a new pattern.
