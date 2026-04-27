@@ -153,6 +153,28 @@
       color: #888;
       letter-spacing: 2px;
       text-transform: uppercase;
+      outline: none;
+      cursor: text;
+      min-width: 80px;
+      max-width: 50vw;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-radius: 2px;
+      padding: 2px 4px;
+      margin: -2px -4px;
+      transition: background 0.15s;
+    }
+
+    header h1:hover,
+    header h1:focus { background: #1a1a1a; }
+
+    header h1:empty::before {
+      content: attr(data-placeholder);
+      color: #555;
+      font-style: italic;
+      text-transform: none;
+      letter-spacing: 0;
     }
 
     .actions {
@@ -166,11 +188,13 @@
       color: #555;
       min-width: 60px;
       text-align: right;
+      white-space: nowrap;
     }
 
     .word-count {
       font-size: 12px;
       color: #555;
+      white-space: nowrap;
     }
 
     .sync-status {
@@ -192,6 +216,7 @@
       font-size: 13px;
       transition: all 0.15s;
       font-family: inherit;
+      white-space: nowrap;
     }
 
     button:hover {
@@ -214,10 +239,41 @@
       gap: 8px;
     }
 
+    .icon-btn {
+      background: none;
+      border: 1px solid #333;
+      color: #888;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .icon-btn:hover { border-color: #666; color: #ccc; }
+    .icon-btn svg { width: 14px; height: 14px; display: block; }
+    .icon-btn.danger:hover { border-color: #c0392b; color: #e74c3c; }
+
+    .icon-btn--floating {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 2;
+      opacity: 0.4;
+    }
+
+    .icon-btn--floating:hover,
+    .icon-btn--floating:focus-visible { opacity: 1; }
+
     .container {
       flex: 1;
       overflow: auto;
       padding: 48px;
+      position: relative;
     }
 
     .content {
@@ -245,10 +301,13 @@
     @media (max-width: 768px) {
       .container { padding: 24px; }
       header { padding: 10px 14px; }
-      header h1 { font-size: 13px; letter-spacing: 1px; }
+      header h1 { font-size: 13px; letter-spacing: 1px; max-width: 40vw; }
       .actions { gap: 6px; }
       .sync-status { display: none; }
       button { padding: 4px 10px; font-size: 12px; }
+      .icon-btn { width: 24px; height: 24px; padding: 0; }
+      .icon-btn svg { width: 12px; height: 12px; }
+      .icon-btn--floating { top: 8px; right: 8px; opacity: 0.6; }
     }
   </style>
 </head>
@@ -278,7 +337,7 @@
 </div>
 
 <header id="appHeader" hidden>
-  <h1>Notepad</h1>
+  <h1 id="hint" contenteditable="plaintext-only" spellcheck="false" data-placeholder="hint…"></h1>
   <div class="actions">
     <span class="sync-status" id="syncStatus"></span>
     <span class="word-count" id="wordCount">0 words</span>
@@ -287,12 +346,27 @@
       <span class="page-info" id="pageInfo">1 / 1</span>
       <button id="nextBtn">Next →</button>
     </div>
-    <button id="lockBtn">Lock</button>
-    <button class="danger" id="clearBtn">Clear</button>
+    <button id="switchBtn" class="icon-btn" type="button" aria-label="Switch notepad" title="Switch notepad">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="m2 9 3-3 3 3"/>
+        <path d="M13 18H7a2 2 0 0 1-2-2V6"/>
+        <path d="m22 15-3 3-3-3"/>
+        <path d="M11 6h6a2 2 0 0 1 2 2v10"/>
+      </svg>
+    </button>
   </div>
 </header>
 
 <div class="container" id="appContainer" hidden>
+  <button id="clearBtn" class="icon-btn icon-btn--floating danger" type="button" aria-label="Clear this page" title="Clear this page">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <path d="M3 6h18"/>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      <line x1="10" x2="10" y1="11" y2="17"/>
+      <line x1="14" x2="14" y1="11" y2="17"/>
+    </svg>
+  </button>
   <div class="content" id="editor" contenteditable="true"></div>
 </div>
 
@@ -419,9 +493,10 @@
   const pageInfo = document.getElementById('pageInfo');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
-  const lockBtn = document.getElementById('lockBtn');
+  const switchBtn = document.getElementById('switchBtn');
   const clearBtn = document.getElementById('clearBtn');
   const syncStatus = document.getElementById('syncStatus');
+  const hintEl = document.getElementById('hint');
 
   aiIntro.textContent = AI.intro;
   try { document.execCommand('defaultParagraphSeparator', false, 'div'); } catch {}
@@ -433,6 +508,7 @@
   let phraseId = null;
   let pages = { 1: '' };
   let currentPage = 1;
+  let hint = '';
   let pushTimer = null;
   let autoSaveTimer = null;
   let currentGhostEl = null;
@@ -461,7 +537,7 @@
     if (!cryptoKey || !phraseId) return;
     setSyncStatus('pending', 'Saving…');
     try {
-      const blob = await encryptJSON(cryptoKey, { pages, currentPage });
+      const blob = await encryptJSON(cryptoKey, { pages, currentPage, hint });
       const { error } = await supabase.from('notes').upsert({
         id: phraseId,
         encrypted: blob,
@@ -682,9 +758,11 @@
       if (cloud) {
         pages = cloud.pages || { 1: '' };
         currentPage = cloud.currentPage || 1;
+        hint = cloud.hint || '';
       } else {
         pages = { 1: '' };
         currentPage = 1;
+        hint = '';
       }
 
       phraseScreen.hidden = true;
@@ -692,6 +770,7 @@
       appContainer.hidden = false;
       firstPromptUsed = false;
       reloadEditor();
+      hintEl.textContent = hint;
       editor.focus();
       updateGhost();
     } catch (e) {
@@ -704,16 +783,20 @@
     }
   }
 
-  async function lock() {
+  async function switchNotepad() {
     if (cryptoKey) {
-      pages[currentPage] = cleanForSave(editor.innerHTML);
+      clearTimeout(autoSaveTimer);
       clearTimeout(pushTimer);
+      pages[currentPage] = cleanForSave(editor.innerHTML);
+      hint = (hintEl.textContent || '').trim().slice(0, 120);
       try { await pushCloud(); } catch {}
     }
     cryptoKey = null;
     phraseId = null;
     pages = { 1: '' };
     currentPage = 1;
+    hint = '';
+    hintEl.textContent = '';
     appHeader.hidden = true;
     appContainer.hidden = true;
     phraseScreen.hidden = false;
@@ -746,7 +829,7 @@
   prevBtn.addEventListener('click', prevPage);
   nextBtn.addEventListener('click', nextPage);
   clearBtn.addEventListener('click', clearPage);
-  lockBtn.addEventListener('click', lock);
+  switchBtn.addEventListener('click', switchNotepad);
 
   editor.addEventListener('input', () => {
     if (editor.textContent && editor.textContent.length > 0) firstPromptUsed = true;
@@ -760,6 +843,26 @@
   editor.addEventListener('blur', clearGhost);
   document.addEventListener('selectionchange', () => {
     if (document.activeElement === editor) updateGhost();
+  });
+
+  function saveHint() {
+    hint = (hintEl.textContent || '').trim().slice(0, 120);
+    queuePush();
+  }
+
+  hintEl.addEventListener('input', () => {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(saveHint, 1000);
+  });
+
+  hintEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); hintEl.blur(); }
+  });
+
+  hintEl.addEventListener('paste', e => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text.replace(/[\r\n]+/g, ' '));
   });
 
   document.addEventListener('keydown', e => {
