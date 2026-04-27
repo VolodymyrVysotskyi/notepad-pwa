@@ -47,7 +47,17 @@
       color: #888;
       letter-spacing: 2px;
       text-transform: uppercase;
-      margin-bottom: 40px;
+      margin-bottom: 24px;
+    }
+
+    .ai-intro {
+      font-size: 14px;
+      font-style: italic;
+      color: #888;
+      line-height: 1.5;
+      max-width: 360px;
+      text-align: center;
+      margin-bottom: 28px;
     }
 
     .phrase-form {
@@ -218,6 +228,20 @@
       outline: none;
     }
 
+    /* Cursor-aware ghost placeholder. The data-placeholder attribute is set
+       by updateGhost() ONLY on truly-empty blocks (allowing a single <br>
+       which browsers insert for cursor positioning) and removed on input,
+       so we can trust the attribute alone — no :empty needed. The attribute
+       is stripped by cleanForSave() before persistence. */
+    .content [data-placeholder]::before,
+    .content[data-placeholder]::before {
+      content: attr(data-placeholder);
+      color: #555;
+      font-style: italic;
+      pointer-events: none;
+      user-select: none;
+    }
+
     @media (max-width: 768px) {
       .container { padding: 24px; }
       header { padding: 10px 14px; }
@@ -232,6 +256,7 @@
 
 <div class="phrase-screen" id="phraseScreen">
   <div class="phrase-title">Notepad</div>
+  <p class="ai-intro" id="aiIntro"></p>
   <form class="phrase-form" id="phraseForm" autocomplete="off">
     <div class="phrase-input-wrap">
       <input class="phrase-input" type="text" id="phraseInput" placeholder="enter with phrase" autocomplete="off" spellcheck="false" autocapitalize="off" autofocus>
@@ -291,6 +316,28 @@
   const KEY_SALT = 'notepad-key-v1';
   const ID_SALT = 'notepad-id-v1';
   const PBKDF2_ITERS = 100000;
+
+  // ---------------------------------------------------------------------------
+  // AI VOICE — short and sharp as a pocket knife of a ninja-gangster.
+  // Quiet menace, dry confidence. Every line is a cut. Static copy; no LLM
+  // calls, no network. Roasts the blank page, never the writer.
+  // ---------------------------------------------------------------------------
+  const AI = {
+    intro: "One phrase locks everything. Forget it, the words go with it.",
+    firstPrompt: "What's it gonna be?",
+    rowPlaceholders: [
+      "Words. Now.",
+      "Make it count.",
+      "Plot twist?",
+      "Stop thinking. Type.",
+      "Surprise me.",
+      "Anything but 'asdf'.",
+      "Write like you mean it.",
+      "Out with it.",
+      "Any thought will do.",
+      "Less staring, more typing.",
+    ],
+  };
 
   // ---------------------------------------------------------------------------
   // CRYPTO — AES-GCM-256 with PBKDF2-derived key. 128-bit security level.
@@ -364,6 +411,7 @@
   const eyeIconClosed = document.getElementById('eyeIconClosed');
   const phraseError = document.getElementById('phraseError');
   const enterBtn = document.getElementById('enterBtn');
+  const aiIntro = document.getElementById('aiIntro');
   const appHeader = document.getElementById('appHeader');
   const appContainer = document.getElementById('appContainer');
   const editor = document.getElementById('editor');
@@ -375,6 +423,9 @@
   const clearBtn = document.getElementById('clearBtn');
   const syncStatus = document.getElementById('syncStatus');
 
+  aiIntro.textContent = AI.intro;
+  try { document.execCommand('defaultParagraphSeparator', false, 'div'); } catch {}
+
   // ---------------------------------------------------------------------------
   // STATE
   // ---------------------------------------------------------------------------
@@ -384,6 +435,8 @@
   let currentPage = 1;
   let pushTimer = null;
   let autoSaveTimer = null;
+  let currentGhostEl = null;
+  let firstPromptUsed = false;
 
   // ---------------------------------------------------------------------------
   // CLOUD SYNC
@@ -415,12 +468,12 @@
         updated_at: new Date().toISOString()
       });
       if (error) {
-        setSyncStatus('error', error.message);
+        setSyncStatus('error', "Cloud's not picking up");
         return;
       }
       setSyncStatus('ok', 'Synced');
-    } catch (e) {
-      setSyncStatus('error', e.message);
+    } catch {
+      setSyncStatus('error', "Cloud's not picking up");
     }
   }
 
@@ -446,6 +499,12 @@
   // ---------------------------------------------------------------------------
   // EDITOR / NAVIGATION
   // ---------------------------------------------------------------------------
+  // Strip data-placeholder before persisting — the attribute is a runtime hint
+  // for the ghost-text CSS, not part of the user's content.
+  function cleanForSave(html) {
+    return (html || '').replace(/\s*data-placeholder="[^"]*"/g, '');
+  }
+
   function reloadEditor() {
     if (!pages[currentPage]) {
       const nums = Object.keys(pages).map(Number).sort((a, b) => a - b);
@@ -455,10 +514,11 @@
     editor.innerHTML = DOMPurify.sanitize(pages[currentPage] || '');
     updateWordCount();
     updateUI();
+    updateGhost();
   }
 
   function loadPage(page) {
-    pages[currentPage] = editor.innerHTML;
+    pages[currentPage] = cleanForSave(editor.innerHTML);
     Object.keys(pages).forEach(p => {
       const n = parseInt(p);
       if (n > 1 && (!pages[p] || pages[p].trim() === '')) delete pages[p];
@@ -466,6 +526,7 @@
     currentPage = page;
     editor.innerHTML = DOMPurify.sanitize(pages[currentPage] || '');
     updateWordCount();
+    updateGhost();
   }
 
   function updateUI() {
@@ -502,15 +563,16 @@
   }
 
   function clearPage() {
-    if (editor.innerHTML && confirm('Clear this page?')) {
+    if (editor.innerHTML && confirm('Wipe this page? No undo.')) {
       editor.innerHTML = '';
       savePage();
       updateWordCount();
+      updateGhost();
     }
   }
 
   function savePage() {
-    pages[currentPage] = editor.innerHTML;
+    pages[currentPage] = cleanForSave(editor.innerHTML);
     queuePush();
   }
 
@@ -518,6 +580,77 @@
     const text = editor.textContent.trim();
     const words = text ? text.split(/\s+/).length : 0;
     wordCount.textContent = words + (words === 1 ? ' word' : ' words');
+  }
+
+  // ---------------------------------------------------------------------------
+  // GHOST PLACEHOLDER — sets data-placeholder on the empty block at the cursor.
+  // CSS handles rendering; data-placeholder is stripped before persistence.
+  // ---------------------------------------------------------------------------
+  function clearGhost() {
+    if (currentGhostEl) {
+      currentGhostEl.removeAttribute('data-placeholder');
+      currentGhostEl = null;
+    }
+    editor.removeAttribute('data-placeholder');
+  }
+
+  function blockIsEmpty(el) {
+    if (!el) return false;
+    if (el.textContent && el.textContent.length > 0) return false;
+    // Allow a single <br> (browser-inserted on Enter) but no other children.
+    for (const child of el.children) {
+      if (child.tagName !== 'BR') return false;
+    }
+    return true;
+  }
+
+  function findCurrentBlock() {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return null;
+    let node = sel.anchorNode;
+    if (!node) return null;
+    if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+    while (node && node !== editor && node.parentNode !== editor) {
+      node = node.parentNode;
+    }
+    if (node === editor || !node) return null;
+    return node;
+  }
+
+  function ghostCopyForLine(blockEl) {
+    const editorIsEmpty = !editor.textContent || editor.textContent.length === 0;
+    if (editorIsEmpty && !firstPromptUsed) {
+      return AI.firstPrompt;
+    }
+    let lineIndex = 0;
+    if (blockEl && blockEl.parentNode === editor) {
+      lineIndex = Array.prototype.indexOf.call(editor.children, blockEl);
+    }
+    return AI.rowPlaceholders[lineIndex % AI.rowPlaceholders.length];
+  }
+
+  function updateGhost() {
+    clearGhost();
+    if (!cryptoKey) return;
+    if (document.activeElement !== editor) {
+      // When unfocused, still show a ghost on a wholly-empty editor so the
+      // user sees the prompt before they click in.
+      if (!editor.textContent || editor.textContent.length === 0) {
+        if (editor.children.length === 0) {
+          editor.setAttribute('data-placeholder', ghostCopyForLine(null));
+        }
+      }
+      return;
+    }
+    const block = findCurrentBlock();
+    if (block && blockIsEmpty(block)) {
+      block.setAttribute('data-placeholder', ghostCopyForLine(block));
+      currentGhostEl = block;
+    } else if (!block && editor.children.length === 0 &&
+               (!editor.textContent || editor.textContent.length === 0)) {
+      // No nested blocks yet — the editor itself is the empty line.
+      editor.setAttribute('data-placeholder', ghostCopyForLine(null));
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -557,10 +690,12 @@
       phraseScreen.hidden = true;
       appHeader.hidden = false;
       appContainer.hidden = false;
+      firstPromptUsed = false;
       reloadEditor();
       editor.focus();
+      updateGhost();
     } catch (e) {
-      phraseError.textContent = e.message || 'Something went wrong. Try again.';
+      phraseError.textContent = "That's not it. Try again.";
       cryptoKey = null;
       phraseId = null;
     } finally {
@@ -571,7 +706,7 @@
 
   async function lock() {
     if (cryptoKey) {
-      pages[currentPage] = editor.innerHTML;
+      pages[currentPage] = cleanForSave(editor.innerHTML);
       clearTimeout(pushTimer);
       try { await pushCloud(); } catch {}
     }
@@ -614,9 +749,17 @@
   lockBtn.addEventListener('click', lock);
 
   editor.addEventListener('input', () => {
+    if (editor.textContent && editor.textContent.length > 0) firstPromptUsed = true;
     updateWordCount();
+    updateGhost();
     clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(savePage, 1000);
+  });
+
+  editor.addEventListener('focus', updateGhost);
+  editor.addEventListener('blur', clearGhost);
+  document.addEventListener('selectionchange', () => {
+    if (document.activeElement === editor) updateGhost();
   });
 
   document.addEventListener('keydown', e => {

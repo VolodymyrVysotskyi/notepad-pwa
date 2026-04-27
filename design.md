@@ -8,7 +8,44 @@ For a visual reference of every token and component, open `design-system.html`.
 
 ## Brand voice
 
-A dark, serif notepad. Calm and quiet by default; gold is reserved for things you can act on. Copy is terse — "Enter", "Lock", "Clear" — never enthusiastic. The interface should feel like a private writing tool, not a product surface.
+> **Notepad is short and sharp as a pocket knife of a ninja-gangster.**
+
+Wise with a bite. Quiet menace, dry confidence. Every line is a cut — never a paragraph, never a speech. Friendly but precisely keen. Can roast the act of staring at a blank page; never the writer or what they wrote.
+
+System chrome stays terse ("Enter", "Lock", "Clear"). The persona shows up in three reserved slots: the lock-screen intro, the first-open prompt, and the empty-row ghost placeholder.
+
+**Examples in voice:**
+- "One phrase locks everything. Forget it, the words go with it." (lock-screen intro)
+- "What's it gonna be?" (first-open prompt)
+- "Words. Now."
+- "Make it count."
+- "That's not it. Try again." (wrong phrase)
+
+**Length test:** if a line doesn't fit on a phone screen in one breath, it's too long. Most lines are 2–6 words. The intro is the only line allowed to break twelve.
+
+**Anti-patterns:**
+- No paragraphs. Ever. One clause, maybe two.
+- No punching down — never mock the user, their topic, or their writing skill.
+- No clever-at-the-cost-of-clarity in errors. Errors are stressful; the bite softens to a nudge.
+- No motivation, no coaching, no warmth-padding. The notepad has a mouth, not a TED talk.
+- The persona never appears in system controls — buttons stay "Enter", "Lock", "Clear".
+
+All persona copy is **static and lives in `index.html`** in a single `AI` constant. There are no LLM calls; the encryption model (nothing plaintext leaves the browser) stays intact.
+
+---
+
+## Design principles
+
+Eight rules. Each one cuts. The voice in copy is the voice in design.
+
+1. **One job. Writing.** No settings, no themes, no toolbar, no rich text. If a feature isn't a sentence on a page, it doesn't ship.
+2. **Quiet until you act.** Gold is the only color that means *do something*. Nothing else moves, blinks, or pulses. Calm is the default state.
+3. **Words, not chrome.** No icons. Buttons are verbs ("Lock", "Clear"). Arrows are literal `←` and `→` glyphs. The page does not need a logo, a brand mark, or decoration.
+4. **Encryption is the privacy.** No accounts. No email. No recovery. The phrase is the key and the identifier. Lose it, lose the words. Document this; do not soften it with optimism.
+5. **One screen at a time.** Lock screen or editor — never both, never a modal between them. State transitions are visibility toggles, not animations.
+6. **No spinners. No skeletons.** "Working…" is the only loading state. If it takes long enough to need a spinner, it's a bug.
+7. **Brevity is structural.** Copy length is a constraint, not a preference. If a line doesn't fit on a phone in one breath, cut it. Apply to UI labels, error messages, and persona copy alike.
+8. **Doc wins on drift.** When `design.md` and `index.html` disagree, the doc is right and the code gets reconciled. New patterns get a section here before they get a line of CSS.
 
 ---
 
@@ -193,18 +230,19 @@ body (100vh, overflow hidden, flex column)
 
 The default state of the app. A full-viewport overlay containing only:
 
-- **Title** — "Notepad" rendered identically to the header H1 (16px / 400 / `text/muted` / `track/wide` / uppercase). Sits 40px above the form.
+- **Title** — "Notepad" rendered identically to the header H1 (16px / 400 / `text/muted` / `track/wide` / uppercase). Sits 24px above the AI intro.
+- **AI intro** — 1–2 sentence persona line in italic Georgia, 14px / `text/muted` / line-height 1.5, max-width 360px (matches form width), centered. Sits 28px above the form. This is the "what is this?" copy — replaces the previous policy of "the title is the explanation". The exact text lives in `AI.intro`.
 - **Form** — vertical stack, gap 12px, max-width 360px.
   1. **Phrase input** (see below).
   2. **Enter button** (primary variant, full-width).
   3. **Phrase error** — 12px / `status/danger`, min-height 16px so layout doesn't jump when an error appears.
 
-Centered both axes. No other chrome. No "what is this?" copy — the title is the explanation.
+Centered both axes. No other chrome.
 
 **States:**
 - Default — empty input, focused.
 - Working — Enter button shows "Working…", disabled.
-- Error — phrase error shows decryption-failure or network message; input retains value so user can retry.
+- Error — phrase error in voice ("That's not it. Try again."); input retains value so user can retry.
 
 **Accessibility:**
 - Input is `type="password"` (masks the phrase).
@@ -282,11 +320,30 @@ The writing area. `contenteditable`, `max-width: 900px`, `font-size: 15px`, `lin
 |-------|--------|
 | Default | No chrome — the surface is the surrounding container |
 | Focused | `outline: none` — visually identical to default. Cursor is the focus indicator. |
-| Empty | No placeholder — empty space is the empty state. |
+| Empty (current line) | AI ghost placeholder — see below. |
 
 **Accessibility:**
 - `contenteditable="true"` is announced as "edit text" by most screen readers.
 - HTML is run through DOMPurify on read, so paste-injected scripts are stripped before rendering.
+
+### AI ghost placeholder
+
+A faint italic prompt in the persona's voice that appears on the **current empty block under the cursor** (Notion/Bear style). Moves with the cursor and disappears the moment the user types.
+
+| Property | Value |
+|----------|-------|
+| Color | `text/meta` (`#555`) |
+| Font | Georgia italic, inherits editor 15px / line-height 1.8 |
+| Trigger | Block element (direct child of `.content`, or `.content` itself) is empty AND editor is focused |
+| Persistence | **Never** persisted — `data-placeholder` attribute is stripped by `cleanForSave()` before encrypt |
+| Source | `AI.firstPrompt` on the freshly-unlocked empty page; otherwise `AI.rowPlaceholders[lineIndex % pool.length]` (deterministic, no flicker) |
+| Implementation | `data-placeholder` attribute on the empty block + `::before` pseudo-element that reads the attribute |
+
+**Technical notes:**
+- On script init, `document.execCommand('defaultParagraphSeparator', false, 'div')` makes Enter wrap each line in `<div>` so per-line targeting works in Chrome/Safari.
+- `updateGhost()` runs on `selectionchange` (when editor is focused), `input`, `focus`, and after page load / nav.
+- `clearGhost()` runs on `blur` so the ghost doesn't show when the user is on the lock button or sync chip.
+- An unfocused, wholly-empty editor still shows the prompt (so the user sees the AI's question before clicking in).
 
 ---
 
@@ -334,4 +391,4 @@ What collapses:
 - **Iconography** — none. Arrows in nav buttons are literal `←` and `→` glyphs.
 - **Toast / inline notifications** — sync status is the only async-feedback channel.
 - **Settings UI** — none planned.
-- **Onboarding / first-run education** — phrase screen is the first run; the title is the explanation. If we add an "About this notepad" link or expanding help text, that's a new pattern.
+- **Onboarding / first-run education** — phrase screen is the first run; the AI intro line is the explanation. Anything beyond a 1–2 sentence persona line is a new pattern.

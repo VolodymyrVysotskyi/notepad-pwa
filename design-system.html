@@ -779,6 +779,8 @@
   </header>
 
   <nav class="toc" aria-label="Sections">
+    <a href="#voice">Voice</a>
+    <a href="#principles">Principles</a>
     <a href="#colors">Color</a>
     <a href="#typography">Type</a>
     <a href="#tracking">Tracking</a>
@@ -788,11 +790,107 @@
     <a href="#buttons">Buttons</a>
     <a href="#inputs">Inputs</a>
     <a href="#chips">Status chips</a>
+    <a href="#ai-placeholder">AI placeholder</a>
     <a href="#dialogs">Dialogs</a>
     <a href="#composition">Composition</a>
   </nav>
 
   <main>
+
+  <!-- =============================================================== Voice -->
+  <section id="voice">
+    <div class="eyebrow">00 — Voice</div>
+    <h2 class="h2">Brand voice</h2>
+
+    <p style="font-size:18px; color:#e0e0e0; line-height:1.4; max-width:720px; margin-bottom:16px; font-style:italic; border-left:2px solid #f4c430; padding-left:16px;">Notepad is short and sharp as a pocket knife of a ninja-gangster.</p>
+
+    <p class="section-lead">Wise with a bite. Quiet menace, dry confidence. Every line is a cut — never a paragraph, never a speech. Roasts the blank page, never the writer. Lives in three reserved slots: the lock-screen intro, the first-open prompt, and the empty-row ghost placeholder. System chrome stays terse.</p>
+
+    <div style="display:grid; gap:24px; max-width:720px; padding-top:8px;">
+      <div style="padding:20px 24px; background:#111; border:1px solid #2a2a2a; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:12px;">Lock-screen intro · AI.intro</div>
+        <p style="font-size:14px; font-style:italic; color:#888; line-height:1.5;">One phrase locks everything. Forget it, the words go with it.</p>
+      </div>
+      <div style="padding:20px 24px; background:#111; border:1px solid #2a2a2a; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:12px;">First-open prompt · AI.firstPrompt</div>
+        <p style="font-size:15px; font-style:italic; color:#555; line-height:1.8;">What's it gonna be?</p>
+      </div>
+      <div style="padding:20px 24px; background:#111; border:1px solid #2a2a2a; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:12px;">Row placeholders · AI.rowPlaceholders[]</div>
+        <ul style="list-style:none; padding:0; display:grid; gap:6px;">
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Words. Now.</li>
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Make it count.</li>
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Plot twist?</li>
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Stop thinking. Type.</li>
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Surprise me.</li>
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Anything but 'asdf'.</li>
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Write like you mean it.</li>
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Out with it.</li>
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Any thought will do.</li>
+          <li style="font-size:15px; font-style:italic; color:#555; line-height:1.6;">Less staring, more typing.</li>
+        </ul>
+      </div>
+      <div style="padding:20px 24px; background:#111; border:1px solid #2a2a2a; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:12px;">In-voice errors</div>
+        <p style="font-size:12px; color:#e74c3c; line-height:1.5; margin-bottom:6px;">That's not it. Try again. <span style="color:#777; font-style:italic;">— wrong phrase</span></p>
+        <p style="font-size:11px; color:#c0392b; line-height:1.5;">Cloud's not picking up <span style="color:#777; font-style:italic;">— sync error</span></p>
+      </div>
+    </div>
+
+    <div class="a11y-note" style="margin-top:24px"><strong>Length test:</strong> if a line doesn't fit on a phone screen in one breath, it's too long. Most lines: 2–6 words. The intro is the only line allowed to break twelve.</div>
+    <div class="a11y-note"><strong>Anti-patterns:</strong> no paragraphs ever. No punching down. No clever-at-the-cost-of-clarity in errors. No motivation, no coaching, no warmth-padding.</div>
+    <div class="a11y-note"><strong>Source of truth:</strong> all persona copy lives in the <code>AI</code> constant in <code>index.html</code>. Static — no LLM calls, no network. Encryption model unaffected.</div>
+  </section>
+
+  <!-- ========================================================== Principles -->
+  <section id="principles">
+    <div class="eyebrow">00.5 — Principles</div>
+    <h2 class="h2">Design principles</h2>
+    <p class="section-lead">Eight rules. Each one cuts. The voice in copy is the voice in design.</p>
+
+    <ol style="list-style:none; counter-reset:p; padding:0; display:grid; gap:20px; max-width:720px;">
+      <li style="counter-increment:p; padding:18px 24px; background:#111; border:1px solid #2a2a2a; border-left:2px solid #f4c430; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; color:#f4c430; margin-bottom:6px;">01</div>
+        <div style="font-size:16px; color:#e0e0e0; margin-bottom:6px;">One job. Writing.</div>
+        <p style="font-size:13px; color:#888; line-height:1.6;">No settings, no themes, no toolbar, no rich text. If a feature isn't a sentence on a page, it doesn't ship.</p>
+      </li>
+      <li style="counter-increment:p; padding:18px 24px; background:#111; border:1px solid #2a2a2a; border-left:2px solid #f4c430; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; color:#f4c430; margin-bottom:6px;">02</div>
+        <div style="font-size:16px; color:#e0e0e0; margin-bottom:6px;">Quiet until you act.</div>
+        <p style="font-size:13px; color:#888; line-height:1.6;">Gold is the only color that means <em>do something</em>. Nothing else moves, blinks, or pulses. Calm is the default state.</p>
+      </li>
+      <li style="counter-increment:p; padding:18px 24px; background:#111; border:1px solid #2a2a2a; border-left:2px solid #f4c430; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; color:#f4c430; margin-bottom:6px;">03</div>
+        <div style="font-size:16px; color:#e0e0e0; margin-bottom:6px;">Words, not chrome.</div>
+        <p style="font-size:13px; color:#888; line-height:1.6;">No icons. Buttons are verbs (<code>Lock</code>, <code>Clear</code>). Arrows are literal <code>←</code> and <code>→</code> glyphs. No logo, no brand mark, no decoration.</p>
+      </li>
+      <li style="counter-increment:p; padding:18px 24px; background:#111; border:1px solid #2a2a2a; border-left:2px solid #f4c430; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; color:#f4c430; margin-bottom:6px;">04</div>
+        <div style="font-size:16px; color:#e0e0e0; margin-bottom:6px;">Encryption is the privacy.</div>
+        <p style="font-size:13px; color:#888; line-height:1.6;">No accounts. No email. No recovery. The phrase is the key and the identifier. Lose it, lose the words. Document it; do not soften it with optimism.</p>
+      </li>
+      <li style="counter-increment:p; padding:18px 24px; background:#111; border:1px solid #2a2a2a; border-left:2px solid #f4c430; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; color:#f4c430; margin-bottom:6px;">05</div>
+        <div style="font-size:16px; color:#e0e0e0; margin-bottom:6px;">One screen at a time.</div>
+        <p style="font-size:13px; color:#888; line-height:1.6;">Lock screen or editor — never both, never a modal between them. State transitions are visibility toggles, not animations.</p>
+      </li>
+      <li style="counter-increment:p; padding:18px 24px; background:#111; border:1px solid #2a2a2a; border-left:2px solid #f4c430; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; color:#f4c430; margin-bottom:6px;">06</div>
+        <div style="font-size:16px; color:#e0e0e0; margin-bottom:6px;">No spinners. No skeletons.</div>
+        <p style="font-size:13px; color:#888; line-height:1.6;">"Working…" is the only loading state. If it takes long enough to need a spinner, it's a bug.</p>
+      </li>
+      <li style="counter-increment:p; padding:18px 24px; background:#111; border:1px solid #2a2a2a; border-left:2px solid #f4c430; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; color:#f4c430; margin-bottom:6px;">07</div>
+        <div style="font-size:16px; color:#e0e0e0; margin-bottom:6px;">Brevity is structural.</div>
+        <p style="font-size:13px; color:#888; line-height:1.6;">Copy length is a constraint, not a preference. If a line doesn't fit on a phone in one breath, cut it. Applies to UI labels, errors, and persona copy alike.</p>
+      </li>
+      <li style="counter-increment:p; padding:18px 24px; background:#111; border:1px solid #2a2a2a; border-left:2px solid #f4c430; border-radius:4px;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; color:#f4c430; margin-bottom:6px;">08</div>
+        <div style="font-size:16px; color:#e0e0e0; margin-bottom:6px;">Doc wins on drift.</div>
+        <p style="font-size:13px; color:#888; line-height:1.6;">When <code>design.md</code> and <code>index.html</code> disagree, the doc is right and the code gets reconciled. New patterns get a section here before a line of CSS.</p>
+      </li>
+    </ol>
+  </section>
 
   <!-- ============================================================== Color -->
   <section id="colors">
@@ -1167,9 +1265,76 @@
     <div class="a11y-note" style="margin-top:16px"><strong>Accessibility gap:</strong> sync status changes silently. Add <code>aria-live="polite"</code> to the chip so state changes are announced.</div>
   </section>
 
+  <!-- ====================================================== AI placeholder -->
+  <section id="ai-placeholder">
+    <div class="eyebrow">10 — AI placeholder</div>
+    <h2 class="h2">AI ghost placeholder</h2>
+    <p class="section-lead">A faint italic prompt in the persona's voice. Appears on the current empty block under the cursor; moves with the cursor; vanishes the moment the user types. Never persisted — the <code style="color:#f4c430">data-placeholder</code> attribute is stripped before encrypt.</p>
+
+    <div style="display:grid; gap:32px; padding-top:8px;">
+      <div>
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:12px;">Lock-screen composition (intro + form)</div>
+        <div style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:4px; padding:48px 32px; display:flex; flex-direction:column; align-items:center;">
+          <div style="font-size:16px; color:#888; letter-spacing:2px; text-transform:uppercase; margin-bottom:24px;">Notepad</div>
+          <p style="font-size:14px; font-style:italic; color:#888; line-height:1.5; max-width:360px; text-align:center; margin-bottom:28px;">I'm your notepad with a memory and a mouth. Pick a phrase — write what's on your mind, and I'll lock it behind that phrase. Lose the phrase and we both pretend this never happened.</p>
+          <div style="display:flex; flex-direction:column; gap:12px; width:100%; max-width:360px;">
+            <input type="password" class="input-demo" value="••••••••••••" style="padding:12px 16px; font-size:15px;">
+            <button class="btn btn-primary" style="padding:12px 16px; font-size:14px;">Enter</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:12px;">First-open state · empty editor</div>
+        <div style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:4px; padding:48px; max-width:720px;">
+          <div style="max-width:540px; line-height:1.8; font-size:15px; min-height:80px;">
+            <span style="color:#555; font-style:italic;">Alright — what are we writing today?</span><span style="color:#e0e0e0; animation:none;">|</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:12px;">Mid-document state · cursor on empty line</div>
+        <div style="background:#1a1a1a; border:1px solid #2a2a2a; border-radius:4px; padding:48px; max-width:720px;">
+          <div style="max-width:540px; line-height:1.8; font-size:15px;">
+            <div style="color:#e0e0e0;">The first sketch of an idea — half-formed, ungrammatical, true.</div>
+            <div style="color:#e0e0e0;">A second line, less precious than the first.</div>
+            <div><span style="color:#555; font-style:italic;">Plot twist?</span><span style="color:#e0e0e0;">|</span></div>
+            <div style="color:#e0e0e0;">Picks up after the cursor moves on.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid; gap:8px; padding-top:24px; max-width:720px;">
+      <div style="display:grid; grid-template-columns:200px 1fr; gap:24px; padding:12px 0; border-bottom:1px solid #2a2a2a;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:12px; color:#ccc;">Color</div>
+        <div style="font-size:13px; color:#888;"><code style="color:#f4c430">text/meta · #555</code></div>
+      </div>
+      <div style="display:grid; grid-template-columns:200px 1fr; gap:24px; padding:12px 0; border-bottom:1px solid #2a2a2a;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:12px; color:#ccc;">Font</div>
+        <div style="font-size:13px; color:#888;">Georgia italic · inherits editor 15px / 1.8</div>
+      </div>
+      <div style="display:grid; grid-template-columns:200px 1fr; gap:24px; padding:12px 0; border-bottom:1px solid #2a2a2a;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:12px; color:#ccc;">Trigger</div>
+        <div style="font-size:13px; color:#888;">Block element is empty AND editor focused (or wholly-empty editor when blurred)</div>
+      </div>
+      <div style="display:grid; grid-template-columns:200px 1fr; gap:24px; padding:12px 0; border-bottom:1px solid #2a2a2a;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:12px; color:#ccc;">Selection</div>
+        <div style="font-size:13px; color:#888;"><code style="color:#f4c430">AI.firstPrompt</code> on freshly-unlocked empty page; otherwise <code style="color:#f4c430">AI.rowPlaceholders[index % pool]</code></div>
+      </div>
+      <div style="display:grid; grid-template-columns:200px 1fr; gap:24px; padding:12px 0;">
+        <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:12px; color:#ccc;">Persistence</div>
+        <div style="font-size:13px; color:#888;">Never. <code style="color:#f4c430">cleanForSave()</code> strips <code>data-placeholder</code> before encrypt.</div>
+      </div>
+    </div>
+
+    <div class="a11y-note" style="margin-top:24px"><strong>Implementation:</strong> <code>document.execCommand('defaultParagraphSeparator', false, 'div')</code> on init forces Chrome/Safari Enter-key behavior to wrap lines in <code>&lt;div&gt;</code> so per-line targeting works. <code>updateGhost()</code> runs on <code>selectionchange</code>, <code>input</code>, <code>focus</code>, and after page nav; <code>clearGhost()</code> on <code>blur</code>.</div>
+  </section>
+
   <!-- ============================================================== Dialogs -->
   <section id="dialogs">
-    <div class="eyebrow">10 — Dialogs</div>
+    <div class="eyebrow">11 — Dialogs</div>
     <h2 class="h2">Dialogs</h2>
     <p class="section-lead">Two modal shapes used in the app, rendered with their actual content. Anatomy of the body, top to bottom, is fixed across variants.</p>
 
@@ -1219,7 +1384,7 @@
 
   <!-- ========================================================== Composition -->
   <section id="composition">
-    <div class="eyebrow">11 — Composition</div>
+    <div class="eyebrow">12 — Composition</div>
     <h2 class="h2">Layout composition</h2>
     <p class="section-lead">The live page renders in this order. Header is fixed; container scrolls; dialogs are portal-style and render only when open.</p>
 
