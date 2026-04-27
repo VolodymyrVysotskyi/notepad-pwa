@@ -4,6 +4,19 @@ Notable changes to the notepad. Newest first.
 
 ---
 
+## 2026-04-27 — Cloud-only architecture (v5)
+
+- **Removed all browser-side persistence.** Supabase is now the sole source of truth. The encrypted `localStorage` blob (`notepad-data`, `notepad-id`) is gone — every entry pulls from Supabase, every save pushes to Supabase. The app behaves identically across any browser cache state: fresh, stale, cleared, or incognito. Nothing is stored in the browser between sessions.
+- **Service Worker retired.** `sw.js` was a cache-first offline shell; with no offline mode there's no reason to intercept fetches. The file is replaced by a self-destructing SW that unregisters itself and clears all caches on activate, so existing v4 PWA installs migrate cleanly. The HTML no longer registers a SW. (`sw.js` can be deleted entirely in a future release once we're confident no v4 installs remain.)
+- **Network failure on entry now blocks instead of silently corrupting cloud state.** Previously, a Supabase reachability error during `pullCloud()` was treated like "no data found", and the user proceeded into an empty editor — whose first save would overwrite their actual cloud blob. Now `pullCloud()` throws on network/permission errors, and `enter()` shows "Couldn't reach server. Try again." while keeping the user on the phrase screen. Decrypt-fail still proceeds as fresh (per v4).
+- **Lock now flushes pending edits.** Previously `lock()` queued a 1s push and immediately nulled the crypto key, so the queued push fired with a null key and silently no-op'd — losing any unsynced edits. The localStorage blob masked this loss; cloud-only would not. `lock()` is now async and awaits `pushCloud()` before clearing the key.
+- **One-shot legacy cleanup** runs on every load: drops `notepad-*` localStorage keys from v1/v2/v3/v4 and unregisters any pre-existing Service Worker. Idempotent.
+
+### Tradeoffs accepted
+- No offline mode. Every entry needs network.
+- Slower cold load (~200–500ms Supabase round-trip on entry; was instant when warm-cached).
+- Reload during edit can lose up to ~1s of typing (was preserved by localStorage every keystroke).
+
 ## 2026-04-27 — Phrase screen stuck after entry (v4)
 
 - **Bug:** entering a phrase ran the unlock flow successfully, but the homepage overlay never disappeared. Cause was a CSS specificity tie: `.phrase-screen { display: flex }` (specificity 0,0,1,0) and the UA `[hidden] { display: none }` (also 0,0,1,0) collide, and author CSS wins on ties — so the `hidden` attribute did nothing for this element. Added `.phrase-screen[hidden] { display: none; }` (specificity 0,0,2,0).

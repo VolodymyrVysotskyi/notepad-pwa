@@ -1,20 +1,14 @@
-const CACHE = 'notepad-v4';
-const FILES = ['/', '/index.html', '/manifest.json'];
-
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
-  self.skipWaiting();
-});
+// Self-destructing SW: retires the v3/v4 cache-first SW. Existing PWA installs
+// won't see the new HTML otherwise, since the registered SW intercepts every
+// fetch. Once activated, this version unregisters itself and reloads clients.
+self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
-  );
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+    await self.registration.unregister();
+    const clients = await self.clients.matchAll();
+    clients.forEach(c => c.navigate(c.url));
+  })());
 });
