@@ -1,4 +1,4 @@
-const CACHE = 'notepad-v1';
+const CACHE = 'notepad-v2';
 const FILES = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
