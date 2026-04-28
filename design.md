@@ -30,7 +30,34 @@ The persona is text-led on the **lock screen** (intro line) and inside the **edi
 - No motivation, no coaching, no warmth-padding. The notepad has a mouth, not a TED talk.
 - The persona never appears as a button label or icon tooltip. Persona is reserved for the three copy slots above.
 
-All persona copy is **static and lives in `index.html`** in a single `AI` constant. There are no LLM calls; the encryption model (nothing plaintext leaves the browser) stays intact.
+All persona copy is **static and lives in `index.html`** in the `POOL` constant. There are no LLM calls; the encryption model (nothing plaintext leaves the browser) stays intact.
+
+### Context-aware variants
+
+Every line in `POOL` is tagged. At unlock and at each `switchNotepad()`, `AI.refresh()` resolves the user's local clock to a tag set and picks fresh lines.
+
+**Tags from the clock:**
+
+| Bucket | Tag | Hours |
+|--------|-----|-------|
+| Late night | `late-night` | 23, 0–3 |
+| Early morning | `early-morning` | 4–7 |
+| Morning | `morning` | 8–11 |
+| Afternoon | `afternoon` | 12–16 |
+| Evening | `evening` | 17–20 |
+| Night | `night` | 21–22 |
+| Monday | `monday` | day 1 |
+| Friday | `friday` | day 5 |
+| Weekend | `weekend` | day 0, 6 |
+| Midweek | `midweek` | day 2–4 |
+
+**Picking rules:**
+- Lines with tags matching the current context are preferred. If none match, untagged defaults are used.
+- The intro and first-open prompt pick a single line at random from the matching set.
+- Row placeholders return the matching set followed by the untagged defaults, so the per-line index lands on a context line first and falls back gracefully.
+- All clock reads are local-only — `new Date()`, no network, no geolocation.
+
+**Why local-only signals:** time and day are free, private, and don't break the cloud-only encryption model. Weather (geolocation + API) was considered and deferred — adding network calls on load would make the lock screen depend on a third-party endpoint, which contradicts principle 6 (no spinners) and adds a privacy-leak surface.
 
 ---
 
