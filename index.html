@@ -395,23 +395,110 @@
   // AI VOICE — short and sharp as a pocket knife of a ninja-gangster.
   // Quiet menace, dry confidence. Every line is a cut. Static copy; no LLM
   // calls, no network. Roasts the blank page, never the writer.
+  //
+  // Lines are tagged by context (time-of-day + day-of-week). aiContext()
+  // resolves the user's local clock to tags; pickByContext() picks tagged
+  // lines first, falling back to untagged defaults. AI.refresh() recomputes
+  // the cached picks at each unlock + switch so a new session gets new lines.
   // ---------------------------------------------------------------------------
-  const AI = {
-    intro: "One phrase locks everything. Forget it, the words go with it.",
-    firstPrompt: "What's it gonna be?",
+  const POOL = {
+    intros: [
+      { tags: [], line: "One phrase locks everything. Forget it, the words go with it." },
+      { tags: ['late-night'], line: "It's late. One phrase locks the page. Forget it, the night takes the words." },
+      { tags: ['early-morning'], line: "Up early. One phrase locks it. Forget it, the day starts clean without you." },
+      { tags: ['morning'], line: "Morning. One phrase locks the page. Forget it, the day starts clean." },
+      { tags: ['evening'], line: "Evening. One phrase locks it. Forget it, the page goes dark." },
+      { tags: ['night'], line: "Late again. One phrase locks the page. Forget it, the words sleep with you." },
+      { tags: ['monday'], line: "Monday already. One phrase locks the week down. Forget it, the week stays yours." },
+      { tags: ['friday'], line: "Friday. One phrase locks the page. Forget it tonight, it stays gone." },
+      { tags: ['weekend'], line: "Weekend. One phrase locks the page. Forget it, no one remembers." },
+    ],
+    firstPrompts: [
+      { tags: [], line: "What's it gonna be?" },
+      { tags: ['late-night'], line: "What's keeping you up?" },
+      { tags: ['early-morning'], line: "First thought. Go." },
+      { tags: ['morning'], line: "Morning. What's first?" },
+      { tags: ['afternoon'], line: "Afternoon. Out with it." },
+      { tags: ['evening'], line: "Evening. What's loud?" },
+      { tags: ['night'], line: "Night. Talk to me." },
+      { tags: ['monday'], line: "Monday. What's the move?" },
+      { tags: ['friday'], line: "Friday. What's left to say?" },
+      { tags: ['weekend'], line: "Weekend. What's on your mind?" },
+    ],
     rowPlaceholders: [
-      "Words. Now.",
-      "Make it count.",
-      "Plot twist?",
-      "Stop thinking. Type.",
-      "Surprise me.",
-      "Anything but 'asdf'.",
-      "Write like you mean it.",
-      "Out with it.",
-      "Any thought will do.",
-      "Less staring, more typing.",
+      { tags: [], line: "Words. Now." },
+      { tags: [], line: "Make it count." },
+      { tags: [], line: "Plot twist?" },
+      { tags: [], line: "Stop thinking. Type." },
+      { tags: [], line: "Surprise me." },
+      { tags: [], line: "Less staring, more typing." },
+      { tags: ['late-night'], line: "Late writes hit different." },
+      { tags: ['late-night'], line: "Insomnia? Spill it." },
+      { tags: ['late-night'], line: "Past midnight. Speak." },
+      { tags: ['early-morning'], line: "Coffee and consequences." },
+      { tags: ['early-morning'], line: "First thought. Go." },
+      { tags: ['morning'], line: "Morning, killer." },
+      { tags: ['morning'], line: "Day's edge. Write." },
+      { tags: ['afternoon'], line: "Lunch over. Type." },
+      { tags: ['afternoon'], line: "Mid-day, mid-thought." },
+      { tags: ['evening'], line: "Evening light. Type slow." },
+      { tags: ['evening'], line: "Day's almost gone." },
+      { tags: ['night'], line: "Last call. Speak." },
+      { tags: ['monday'], line: "Monday already?" },
+      { tags: ['monday'], line: "Week's first cut." },
+      { tags: ['friday'], line: "Friday. End it loud." },
+      { tags: ['friday'], line: "One more day. Write." },
+      { tags: ['weekend'], line: "No deadlines. Spill." },
+      { tags: ['weekend'], line: "Weekend brain. Use it." },
     ],
   };
+
+  function aiContext(now = new Date()) {
+    const tags = [];
+    const h = now.getHours();
+    if (h >= 23 || h < 4) tags.push('late-night');
+    else if (h < 8) tags.push('early-morning');
+    else if (h < 12) tags.push('morning');
+    else if (h < 17) tags.push('afternoon');
+    else if (h < 21) tags.push('evening');
+    else tags.push('night');
+
+    const day = now.getDay();
+    if (day === 1) tags.push('monday');
+    else if (day === 5) tags.push('friday');
+    else if (day === 0 || day === 6) tags.push('weekend');
+    else tags.push('midweek');
+
+    return tags;
+  }
+
+  function pickByContext(pool, ctx) {
+    const matching = pool.filter(p => p.tags.length && p.tags.some(t => ctx.includes(t)));
+    const fallback = pool.filter(p => p.tags.length === 0);
+    const set = matching.length ? matching : fallback;
+    return set[Math.floor(Math.random() * set.length)].line;
+  }
+
+  function poolByContext(pool, ctx) {
+    const matching = pool.filter(p => p.tags.length && p.tags.some(t => ctx.includes(t)));
+    const fallback = pool.filter(p => p.tags.length === 0);
+    // Context-tagged lines first so they show on early line indices; defaults
+    // round out the pool so any rowPlaceholder index still resolves to a line.
+    return [...matching.map(p => p.line), ...fallback.map(p => p.line)];
+  }
+
+  const AI = {
+    intro: '',
+    firstPrompt: '',
+    rowPlaceholders: [],
+    refresh() {
+      const ctx = aiContext();
+      this.intro = pickByContext(POOL.intros, ctx);
+      this.firstPrompt = pickByContext(POOL.firstPrompts, ctx);
+      this.rowPlaceholders = poolByContext(POOL.rowPlaceholders, ctx);
+    },
+  };
+  AI.refresh();
 
   // ---------------------------------------------------------------------------
   // CRYPTO — AES-GCM-256 with PBKDF2-derived key. 128-bit security level.
@@ -769,6 +856,7 @@
       appHeader.hidden = false;
       appContainer.hidden = false;
       firstPromptUsed = false;
+      AI.refresh();
       reloadEditor();
       hintEl.textContent = hint;
       editor.focus();
@@ -800,6 +888,8 @@
     appHeader.hidden = true;
     appContainer.hidden = true;
     phraseScreen.hidden = false;
+    AI.refresh();
+    aiIntro.textContent = AI.intro;
     phraseInput.value = '';
     phraseError.textContent = '';
     setTimeout(() => phraseInput.focus(), 0);
