@@ -4,6 +4,17 @@ Notable changes to the notepad. Newest first.
 
 ---
 
+## 2026-04-28 — Cache-resilient SW retirement
+
+Users on stale v3/v4 PWA installs were still seeing pre-pivot HTML for one reload after each new deploy. Fixes the self-destructing SW and the HTML's legacy-cleanup so the app reaches a fresh state on the very next load — regardless of browser cache, SW cache, or PWA install state.
+
+- **`sw.js`: `clients.claim()` on activate.** The new SW now takes over previously-controlled tabs immediately instead of waiting for them to release the old SW. Without this, `clients.matchAll().forEach(c => c.navigate(c.url))` was navigating tabs that were still attached to the old cache-first SW, which served the cached HTML again — defeating the whole self-destruct.
+- **`sw.js`: network-only pass-through fetch handler.** Defends against the brief window between `claim()` and `unregister()` where this SW controls the page; every fetch goes straight to the network with `cache: 'no-store'`.
+- **`index.html`: force one reload after unregistering legacy SW.** If the page we're rendering came from an old SW's cache, a single guarded reload (sessionStorage flag prevents loops) gets us bytes from the network. The cleanup is now an async IIFE that awaits each step in order: detect SWs → unregister → clear caches → reload.
+
+### Why
+v5 already retired the SW, but the migration assumed users would either reload twice or hard-refresh. They don't. Production deploys looked correct (latest HTML on `notepad-pwa-eight.vercel.app`) while users with v3/v4 installs kept seeing pre-v5 content.
+
 ## 2026-04-28 — UI refresh: autosave-only, editable hint, icon chrome (v5)
 
 Builds on the cloud-only v5 (below) to refresh the post-entry chrome.
