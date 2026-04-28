@@ -379,11 +379,30 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_mTkd28TZMHaADZc7vEVM3Q_pyMNA72o';
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Retire legacy state from v3/v4: encrypted localStorage blob and Service Worker.
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister()));
-  }
-  if ('caches' in window) caches.keys().then(ks => ks.forEach(k => caches.delete(k)));
+  // Retire legacy state from v3/v4: encrypted localStorage blob, Service Worker,
+  // and the caches the old SW populated. If we found a SW (from any prior version),
+  // the page we're rendering may have come from its cache — force one reload to
+  // guarantee fresh bytes from the network. The sessionStorage flag prevents loops.
+  (async () => {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      if (regs.length) {
+        await Promise.all(regs.map(r => r.unregister()));
+        if ('caches' in window) {
+          const ks = await caches.keys();
+          await Promise.all(ks.map(k => caches.delete(k)));
+        }
+        if (!sessionStorage.getItem('notepad-sw-cleanup')) {
+          sessionStorage.setItem('notepad-sw-cleanup', '1');
+          window.location.reload();
+          return;
+        }
+      } else if ('caches' in window) {
+        const ks = await caches.keys();
+        await Promise.all(ks.map(k => caches.delete(k)));
+      }
+    }
+  })();
   ['notepad-data', 'notepad-id', 'notepad-pages', 'notepad-last-page', 'notepad-dirty']
     .forEach(k => localStorage.removeItem(k));
 
