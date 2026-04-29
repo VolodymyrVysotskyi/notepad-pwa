@@ -26,6 +26,10 @@ Builds on the cloud-only v5 (below) to refresh the post-entry chrome.
 - **Iconography codified in the design system.** Cloud-only v5 introduced the eye toggle on the phrase input; this refresh extends it. Added `.icon-btn` variant (28×28 desktop / 24×24 mobile) and `.icon-btn--floating` sub-variant. `design.md`: added the Iconography component spec, the Editable hint spec, and the v5-UI-refresh removed-components note.
 - **Mobile-first polish.** `white-space: nowrap` on header chips and buttons so the action cluster doesn't wrap awkwardly at 375px. Header H1 truncates at `40vw` on mobile.
 
+## 2026-04-27 — Post-merge smoke test in CI
+
+- Added `.github/workflows/post-merge-smoke.yml` that runs on every push to `main`. Polls the production URL until Vercel finishes deploying this commit's `sw.js`, then verifies four things: the homepage HTML still has the phrase input + CSS specificity fix + Supabase client import; the design system page loads; the Supabase `notes` table accepts a write+delete cycle. Catches the regressions we hit this session (CSS bug, deploy protection re-enabled, table dropped). No secrets needed — the publishable Supabase key is already public-by-design in `index.html`.
+
 ## 2026-04-27 — Cloud-only architecture (v5)
 
 - **Removed all browser-side persistence.** Supabase is now the sole source of truth. The encrypted `localStorage` blob (`notepad-data`, `notepad-id`) is gone — every entry pulls from Supabase, every save pushes to Supabase. The app behaves identically across any browser cache state: fresh, stale, cleared, or incognito. Nothing is stored in the browser between sessions.
