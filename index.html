@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Notepad</title>
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,14 +16,20 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      min-width: 375px;
+    }
+
     body {
       background: #1a1a1a;
       color: #e0e0e0;
       font-family: 'Georgia', serif;
       height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      overscroll-behavior: none;
     }
 
     /* ---------- Phrase screen (homepage) ---------- */
@@ -141,6 +147,15 @@
       align-items: center;
       justify-content: space-between;
       padding: 14px 24px;
+      padding-top: max(14px, env(safe-area-inset-top));
+    }
+
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
 
     header h1 {
@@ -236,8 +251,8 @@
       background: none;
       border: none;
       color: #888;
-      width: 28px;
-      height: 28px;
+      width: 36px;
+      height: 36px;
       padding: 0;
       display: inline-flex;
       align-items: center;
@@ -247,19 +262,8 @@
     }
 
     .icon-btn:hover { color: #ccc; }
-    .icon-btn svg { width: 14px; height: 14px; display: block; }
+    .icon-btn svg { width: 20px; height: 20px; display: block; }
     .icon-btn.danger:hover { color: #e74c3c; }
-
-    .icon-btn--floating {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      z-index: 2;
-      opacity: 0.4;
-    }
-
-    .icon-btn--floating:hover,
-    .icon-btn--floating:focus-visible { opacity: 1; }
 
     .container {
       flex: 1;
@@ -297,9 +301,8 @@
       .actions { gap: 6px; }
       .sync-status { display: none; }
       button { padding: 4px 10px; font-size: 12px; }
-      .icon-btn { width: 24px; height: 24px; padding: 0; }
-      .icon-btn svg { width: 12px; height: 12px; }
-      .icon-btn--floating { top: 8px; right: 8px; opacity: 0.6; }
+      .icon-btn { width: 32px; height: 32px; padding: 0; }
+      .icon-btn svg { width: 18px; height: 18px; }
     }
   </style>
 </head>
@@ -333,11 +336,6 @@
   <div class="actions">
     <span class="sync-status" id="syncStatus"></span>
     <span class="word-count" id="wordCount">0 words</span>
-    <div class="nav-buttons">
-      <button id="prevBtn">← Prev</button>
-      <span class="page-info" id="pageInfo">1 / 1</span>
-      <button id="nextBtn">Next →</button>
-    </div>
     <button id="switchBtn" class="icon-btn" type="button" aria-label="Switch notepad" title="Switch notepad">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
         <path d="m2 9 3-3 3 3"/>
@@ -346,21 +344,29 @@
         <path d="M11 6h6a2 2 0 0 1 2 2v10"/>
       </svg>
     </button>
+    <button id="clearBtn" class="icon-btn danger" type="button" aria-label="Clear this page" title="Clear this page">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M3 6h18"/>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        <line x1="10" x2="10" y1="11" y2="17"/>
+        <line x1="14" x2="14" y1="11" y2="17"/>
+      </svg>
+    </button>
   </div>
 </header>
 
 <div class="container" id="appContainer" hidden>
-  <button id="clearBtn" class="icon-btn icon-btn--floating danger" type="button" aria-label="Clear this page" title="Clear this page">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-      <path d="M3 6h18"/>
-      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
-      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-      <line x1="10" x2="10" y1="11" y2="17"/>
-      <line x1="14" x2="14" y1="11" y2="17"/>
-    </svg>
-  </button>
   <div class="content" id="editor" contenteditable="true"></div>
 </div>
+
+<footer id="appFooter" hidden>
+  <div class="nav-buttons">
+    <button id="prevBtn">← Prev</button>
+    <span class="page-info" id="pageInfo">1 / 1</span>
+    <button id="nextBtn">Next →</button>
+  </div>
+</footer>
 
 <script type="module">
   import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -586,6 +592,7 @@
   const aiIntro = document.getElementById('aiIntro');
   const appHeader = document.getElementById('appHeader');
   const appContainer = document.getElementById('appContainer');
+  const appFooter = document.getElementById('appFooter');
   const editor = document.getElementById('editor');
   const wordCount = document.getElementById('wordCount');
   const pageInfo = document.getElementById('pageInfo');
@@ -866,6 +873,7 @@
       phraseScreen.hidden = true;
       appHeader.hidden = false;
       appContainer.hidden = false;
+      appFooter.hidden = false;
       firstPromptUsed = false;
       AI.refresh();
       reloadEditor();
@@ -898,6 +906,7 @@
     hintEl.textContent = '';
     appHeader.hidden = true;
     appContainer.hidden = true;
+    appFooter.hidden = true;
     phraseScreen.hidden = false;
     AI.refresh();
     aiIntro.textContent = AI.intro;
