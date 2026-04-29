@@ -16,14 +16,20 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      min-width: 375px;
+    }
+
     body {
       background: #1a1a1a;
       color: #e0e0e0;
       font-family: 'Georgia', serif;
       height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      overscroll-behavior: none;
     }
 
     /* ---------- Phrase screen (homepage) ---------- */
