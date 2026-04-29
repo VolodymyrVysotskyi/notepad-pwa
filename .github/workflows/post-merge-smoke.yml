@@ -1,0 +1,85 @@
+name: Post-merge smoke test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for Vercel deploy to match this commit's sw.js
+        env:
+          URL: https://notepad-pwa-eight.vercel.app
+        run: |
+          set -euo pipefail
+          LOCAL_SW=$(head -1 sw.js)
+          for i in $(seq 1 30); do
+            REMOTE_SW=$(curl -fsSL --max-time 5 "$URL/sw.js?cb=$RANDOM" 2>/dev/null | head -1 || echo "")
+            if [ "$LOCAL_SW" = "$REMOTE_SW" ]; then
+              echo "Deploy live (matched after $i polls)"
+              exit 0
+            fi
+            if [ "$i" = "30" ]; then
+              echo "FAIL: Vercel didn't serve this commit's sw.js within 5 min"
+              echo "  expected first line: $LOCAL_SW"
+              echo "  got first line:      $REMOTE_SW"
+              exit 1
+            fi
+            echo "Poll $i: waiting for deploy…"
+            sleep 10
+          done
+
+      - name: Production HTML still has critical markers
+        env:
+          URL: https://notepad-pwa-eight.vercel.app
+        run: |
+          set -euo pipefail
+          html=$(curl -fsSL "$URL/")
+          echo "$html" | grep -qF 'id="phraseInput"' \
+            || { echo "FAIL: phraseInput element missing — homepage broken"; exit 1; }
+          echo "$html" | grep -qF '.phrase-screen[hidden]' \
+            || { echo "FAIL: CSS specificity fix missing — phrase screen will get stuck"; exit 1; }
+          echo "$html" | grep -qF "createClient" \
+            || { echo "FAIL: Supabase client import missing — sync broken"; exit 1; }
+          echo "OK"
+
+      - name: Design system page reachable
+        env:
+          URL: https://notepad-pwa-eight.vercel.app
+        run: |
+          set -euo pipefail
+          curl -fsSL "$URL/design-system.html" | grep -qF 'Notepad — Design System' \
+            || { echo "FAIL: design system page missing or broken"; exit 1; }
+          echo "OK"
+
+      - name: Supabase notes table writable
+        env:
+          SB: https://myiwtcnbfftknjeppnmd.supabase.co
+          KEY: sb_publishable_mTkd28TZMHaADZc7vEVM3Q_pyMNA72o
+          ROW_ID: smoke-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+
+          cleanup() {
+            curl -s -X DELETE "$SB/rest/v1/notes?id=eq.$ROW_ID" \
+              -H "apikey: $KEY" -H "Authorization: Bearer $KEY" >/dev/null || true
+          }
+          trap cleanup EXIT
+
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -X POST "$SB/rest/v1/notes" \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+            -H 'Content-Type: application/json' \
+            -d "{\"id\":\"$ROW_ID\",\"encrypted\":\"x\"}")
+
+          if [ "$status" != "201" ]; then
+            echo "FAIL: Supabase write returned HTTP $status"
+            echo "Likely causes: notes table dropped, RLS policy changed, anon key revoked"
+            exit 1
+          fi
+          echo "OK"
