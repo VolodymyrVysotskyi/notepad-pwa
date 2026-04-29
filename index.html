@@ -109,19 +109,17 @@
 
     .phrase-enter {
       background: none;
-      border: 1px solid #f4c430;
+      border: none;
       color: #f4c430;
       padding: 12px 16px;
-      border-radius: 4px;
       cursor: pointer;
       font-family: inherit;
       font-size: 14px;
-      transition: all 0.15s;
+      transition: color 0.15s;
     }
 
     .phrase-enter:hover {
-      background: #f4c430;
-      color: #000;
+      color: #fff8d6;
     }
 
     .phrase-enter:disabled {
@@ -143,8 +141,6 @@
       align-items: center;
       justify-content: space-between;
       padding: 14px 24px;
-      background: #111;
-      border-bottom: 1px solid #2a2a2a;
     }
 
     header h1 {
@@ -208,19 +204,17 @@
 
     button {
       background: none;
-      border: 1px solid #333;
+      border: none;
       color: #888;
       padding: 5px 14px;
-      border-radius: 4px;
       cursor: pointer;
       font-size: 13px;
-      transition: all 0.15s;
+      transition: color 0.15s;
       font-family: inherit;
       white-space: nowrap;
     }
 
     button:hover {
-      border-color: #666;
       color: #ccc;
     }
 
@@ -230,7 +224,6 @@
     }
 
     button.danger:hover {
-      border-color: #c0392b;
       color: #e74c3c;
     }
 
@@ -241,22 +234,21 @@
 
     .icon-btn {
       background: none;
-      border: 1px solid #333;
+      border: none;
       color: #888;
       width: 28px;
       height: 28px;
       padding: 0;
-      border-radius: 4px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: color 0.15s;
     }
 
-    .icon-btn:hover { border-color: #666; color: #ccc; }
+    .icon-btn:hover { color: #ccc; }
     .icon-btn svg { width: 14px; height: 14px; display: block; }
-    .icon-btn.danger:hover { border-color: #c0392b; color: #e74c3c; }
+    .icon-btn.danger:hover { color: #e74c3c; }
 
     .icon-btn--floating {
       position: absolute;

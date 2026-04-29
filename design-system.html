@@ -561,35 +561,31 @@
 
     .demo-cell {
       padding: 16px;
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 56px;
     }
 
-    .demo-cell.on-dialog { background: #1f1f1f; border-color: #333; }
+    .demo-cell.on-dialog { }
 
     .btn {
       background: none;
-      border: 1px solid #333;
+      border: none;
       color: #888;
       padding: 5px 14px;
-      border-radius: 4px;
       cursor: pointer;
       font-size: 13px;
       font-family: inherit;
-      transition: all 0.15s;
+      transition: color 0.15s;
     }
 
-    .btn-hover { border-color: #666; color: #ccc; }
+    .btn-hover { color: #ccc; }
     .btn-disabled { opacity: 0.3; cursor: not-allowed; }
     .btn-loading { opacity: 0.3; cursor: not-allowed; }
-    .btn-danger-hover { border-color: #c0392b; color: #e74c3c; }
-    .btn-primary { border-color: #f4c430; color: #f4c430; }
-    .btn-primary-hover { background: #f4c430; color: #000; border-color: #f4c430; }
+    .btn-danger-hover { color: #e74c3c; }
+    .btn-primary { color: #f4c430; }
+    .btn-primary-hover { color: #fff8d6; }
 
     /* ---------- Inputs ---------- */
     .input-grid {
