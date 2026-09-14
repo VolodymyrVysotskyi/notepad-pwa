@@ -4,6 +4,30 @@ Notable changes to the notepad. Newest first.
 
 ---
 
+## 2026-09-10 — cleanForSave quote-escape fix + hint-read dedup
+
+Daily review pass. One real defect surviving the previous `cleanForSave` fix, one duplication cleanup.
+
+- **`cleanForSave` still broke on `>` inside a quoted attribute value.** The 2026-05-19 fix scoped the strip to inside an opening tag using `[^>]*` for the attribute span, but that stops at the *first* `>` anywhere in the tag — including one inside a quoted value like `title="1 > 2"`. When that happens the tag never matches at all, so `data-placeholder` silently survives into the saved/encrypted note instead of being stripped. Reachable in practice: `data-placeholder` is set directly on the editor or the current empty block, and DOMPurify-sanitized pasted rich text can carry a `title`/similar attribute containing `>` on that same element. Fix: match quoted spans (`"[^"]*"` / `'[^']*'`) as a unit in the attrs group so `>` inside them can't end the tag early. New tests cover a `>`-bearing attribute before and after `data-placeholder`, and with single quotes.
+- **Hint-read logic de-duplicated onto `readHintFromEl`.** `pushCloud()` was updated on 2026-05-06 to read the hint from the DOM via the new `readHintFromEl()` helper specifically so there'd be one trusted read path, but `switchNotepad()` and `saveHint()` still inlined the same `trim().slice(0, 120)` expression instead of calling it. No behavior change today, but it closes the gap the original fix was meant to close — a future change to the truncation length no longer has to be made in three places.
+
+## 2026-05-19 — Word-count fix + pool invariant test + cleanForSave regex
+
+Daily review pass. Two real defects, two preventative tests.
+
+- **Word count under-counted multi-block content.** `updateWordCount()` read `editor.textContent`, which concatenates child blocks without separators — so `<div>hello</div><div>world</div>` collapsed to `"helloworld"` and the header showed **1 word** instead of 2. Fix: read `editor.innerText` so block boundaries become `\n`; the existing `wordCountOf` whitespace split handles the rest. Added an explicit newline-separated test case to `wordCountOf` to lock the callsite contract.
+- **POOL extracted to `pool.mjs`, invariant pinned by test.** The `POOL` constants previously lived inside the `index.html` `<script>` block, so they could not be exercised from `node:test`. Moved to a sibling ES module imported by both the page and the test. New test walks all 24×7 hour/day combinations and asserts `pickByContext` and `poolByContext` return non-empty strings for every category — protects against a future edit that removes the only untagged fallback from a category and silently breaks unlock on the days that don't match the remaining tags.
+- **`cleanForSave` regex no longer eats text.** The old flat regex stripped `data-placeholder="x"` from anywhere in the HTML, including text content — `<p>Use data-placeholder="hi" here</p>` collapsed to `<p>Use here</p>`, silently dropping a piece of the user's note (worst case: someone documenting HTML attributes loses that part on save). Tightening the leading whitespace from `\s*` to `\s+` wasn't enough — text content has whitespace before random tokens too. Replaced with a regex that scopes the strip to the inside of an opening tag, so attribute-position is the only place a match can land. New tests cover text-content protection (at the start of text and mid-text), idempotency, and first-attribute stripping.
+
+## 2026-05-06 — Bug fixes + first unit-test harness
+
+Daily review pass. Two real bugs fixed; pure helpers extracted into `lib.mjs` and covered by `node:test`.
+
+- **Hint edits no longer silently lost.** `editor` and `hintEl` shared a single `autoSaveTimer`, so a hint edit followed within 1s by an editor edit cancelled the queued `saveHint()` and the in-memory `hint` variable stayed stale — the next `pushCloud()` then encrypted and uploaded the *prior* hint, overwriting the user's current hint in Supabase. Fix: `pushCloud()` now reads the hint from `hintEl.textContent` at upload time, treating the DOM as the source of truth so the shared debounce timer can no longer cause data loss.
+- **Touch swipe ignores vertical motion.** Page-flip handler only inspected `clientX`, so a vertical scroll with >50 px of incidental horizontal drift would page-flip mid-scroll. Fix: track Y too, only trigger when `|dx| > |dy|` and `|dx| ≥ 50`. Encapsulated in a pure `swipeIntent(dx, dy)` helper so it has direct test coverage.
+- **`lib.mjs` introduced.** Moved `aiContext`, `pickByContext`, `poolByContext`, `cleanForSave`, plus new `wordCountOf`, `readHintFromEl`, `swipeIntent` into a sibling module. `index.html` imports them; behavior unchanged. `pickByContext` now takes an optional `rng` arg so tests can pin selection.
+- **`tests/lib.test.mjs` + `.github/workflows/tests.yml`.** Native `node:test` runner — no `package.json`, no devDependencies. CI runs on every push and PR. Covers the boundaries that bit us (hour-of-day, day-of-week, swipe direction/threshold) plus the helper invariants (cleanForSave idempotency, wordCountOf empty/null safety, readHintFromEl truncation).
+
 ## 2026-04-28 — Cache-resilient SW retirement
 
 Users on stale v3/v4 PWA installs were still seeing pre-pivot HTML for one reload after each new deploy. Fixes the self-destructing SW and the HTML's legacy-cleanup so the app reaches a fresh state on the very next load — regardless of browser cache, SW cache, or PWA install state.
