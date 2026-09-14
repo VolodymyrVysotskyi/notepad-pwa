@@ -308,7 +308,7 @@ Rendered as `<h1 contenteditable="plaintext-only" spellcheck="false" data-placeh
 |-------|--------|
 | Empty | `:empty::before` renders `data-placeholder` ("hint…") in `text/meta`, italic, lowercased (no uppercase transform, no letter-spacing). |
 | Filled | The hint text in normal H1 styling. |
-| Hover / Focus | Subtle `surface/body` background tint behind the H1 — signals the affordance without a visible border. |
+| Hover / Focus | `surface/dialog` background tint behind the H1 — a 5-unit lift above `surface/body`, signals the affordance without a visible border. |
 
 Behavior:
 - Single-line. Enter key blurs (does not insert a newline). Paste strips `\r\n`.

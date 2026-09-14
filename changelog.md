@@ -4,6 +4,13 @@ Notable changes to the notepad. Newest first.
 
 ---
 
+## 2026-09-14 — Visible hint hover/focus
+
+The editable hint's hover/focus tint was set to `#1a1a1a` — the exact body background — so both states rendered invisibly. Users hovering or tabbing into the hint field got no feedback that it was editable.
+
+- **`index.html`: hint tint bumped to `surface/dialog` (`#1f1f1f`)** — a 5-unit lift above `surface/body`, subtle enough to keep the header calm but visible enough to signal the affordance for both mouse and keyboard users.
+- **`design.md`: hint state doc reconciled** — the row previously said "Subtle `surface/body` background tint", which is impossible on a header that already sits on `surface/body`. Now references `surface/dialog` explicitly.
+
 ## 2026-04-28 — Cache-resilient SW retirement
 
 Users on stale v3/v4 PWA installs were still seeing pre-pivot HTML for one reload after each new deploy. Fixes the self-destructing SW and the HTML's legacy-cleanup so the app reaches a fresh state on the very next load — regardless of browser cache, SW cache, or PWA install state.
