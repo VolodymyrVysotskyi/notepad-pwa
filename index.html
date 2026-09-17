@@ -373,7 +373,8 @@
   import DOMPurify from 'https://esm.sh/dompurify@3';
   import {
     aiContext, pickByContext, poolByContext,
-    cleanForSave, wordCountOf, readHintFromEl, swipeIntent,
+    cleanForSave, htmlIsBlank, wordCountOf, readHintFromEl, swipeIntent,
+    pruneEmptyPages, resolveCurrentPage, pageLabel,
   } from './lib.mjs';
   import { POOL } from './pool.mjs';
 
@@ -599,11 +600,8 @@
   // EDITOR / NAVIGATION
   // ---------------------------------------------------------------------------
   function reloadEditor() {
-    if (!pages[currentPage]) {
-      const nums = Object.keys(pages).map(Number).sort((a, b) => a - b);
-      currentPage = nums[0] || 1;
-      if (!pages[currentPage]) pages[currentPage] = '';
-    }
+    currentPage = resolveCurrentPage(pages, currentPage);
+    if (pages[currentPage] === undefined) pages[currentPage] = '';
     editor.innerHTML = DOMPurify.sanitize(pages[currentPage] || '');
     updateWordCount();
     updateUI();
@@ -612,10 +610,7 @@
 
   function loadPage(page) {
     pages[currentPage] = cleanForSave(editor.innerHTML);
-    Object.keys(pages).forEach(p => {
-      const n = parseInt(p);
-      if (n > 1 && (!pages[p] || pages[p].trim() === '')) delete pages[p];
-    });
+    pages = pruneEmptyPages(pages, page);
     currentPage = page;
     editor.innerHTML = DOMPurify.sanitize(pages[currentPage] || '');
     updateWordCount();
@@ -623,9 +618,12 @@
   }
 
   function updateUI() {
-    const nums = Object.keys(pages).map(Number).sort((a, b) => a - b);
-    pageInfo.textContent = `${currentPage} / ${nums.length}`;
-    prevBtn.disabled = nums.indexOf(currentPage) <= 0;
+    // position, not currentPage: page keys go non-contiguous once
+    // pruneEmptyPages drops a mid-book page, and `key / count` then reads
+    // as nonsense (e.g. "3 / 2" for pages {1, 3}).
+    const { position, total, isFirst } = pageLabel(pages, currentPage);
+    pageInfo.textContent = `${position} / ${total}`;
+    prevBtn.disabled = isFirst;
   }
 
   function nextPage() {
@@ -656,7 +654,11 @@
   }
 
   function clearPage() {
-    if (editor.innerHTML && confirm('Wipe this page? No undo.')) {
+    // Not raw innerHTML truthiness: an active ghost placeholder or a
+    // leftover browser-inserted <br> makes it truthy on a page that looks
+    // empty, so Clear used to prompt 'No undo.' with nothing to wipe.
+    if (htmlIsBlank(editor.innerHTML)) return;
+    if (confirm('Wipe this page? No undo.')) {
       editor.innerHTML = '';
       savePage();
       updateWordCount();
