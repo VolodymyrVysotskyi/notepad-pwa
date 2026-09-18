@@ -19,7 +19,8 @@ jobs:
           set -euo pipefail
           LOCAL_SW=$(head -1 sw.js)
           for i in $(seq 1 30); do
-            REMOTE_SW=$(curl -fsSL --max-time 5 "$URL/sw.js?cb=$RANDOM" 2>/dev/null | head -1 || echo "")
+            REMOTE_BODY=$(curl -fsSL --max-time 5 "$URL/sw.js?cb=$RANDOM" 2>/dev/null || echo "")
+            REMOTE_SW=${REMOTE_BODY%%$'\n'*}
             if [ "$LOCAL_SW" = "$REMOTE_SW" ]; then
               echo "Deploy live (matched after $i polls)"
               exit 0
@@ -53,7 +54,14 @@ jobs:
           URL: https://notepad-pwa-eight.vercel.app
         run: |
           set -euo pipefail
-          curl -fsSL "$URL/design-system.html" | grep -qF 'Notepad — Design System' \
+          # Fetch into a variable, never `curl | grep -q`: grep exits on its
+          # first match and closes the pipe, curl then fails to write (exit
+          # 23), and pipefail reports the whole step as failed even though the
+          # marker was found. Whether it trips depends on whether curl has
+          # finished writing, so it fails intermittently. Same shape as the
+          # "Production HTML" step above.
+          page=$(curl -fsSL "$URL/design-system.html")
+          echo "$page" | grep -qF 'Notepad — Design System' \
             || { echo "FAIL: design system page missing or broken"; exit 1; }
           echo "OK"
 
