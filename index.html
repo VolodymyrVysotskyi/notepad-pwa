@@ -158,6 +158,15 @@
       padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
 
+    /* The UA stylesheet's [hidden] { display: none } loses to the author
+       `display: flex` above — author origin beats UA regardless of
+       specificity — so `appHeader.hidden = true` did nothing and the lock
+       screen only *looked* clean because .phrase-screen paints over it.
+       Tab and screen readers still reached the whole app chrome. Same trap
+       .phrase-screen[hidden] already covers; .container needs no rule because
+       it never gets a `display` of its own. */
+    header[hidden], footer[hidden] { display: none; }
+
     header h1 {
       font-size: 16px;
       font-weight: normal;
@@ -529,7 +538,11 @@
   let currentPage = 1;
   let hint = '';
   let pushTimer = null;
-  let autoSaveTimer = null;
+  // One timer per input. They used to share `autoSaveTimer`, so a hint edit
+  // within 1s of an editor edit cancelled the pending savePage() — and
+  // savePage is the only place editor.innerHTML reaches `pages`.
+  let editorSaveTimer = null;
+  let hintSaveTimer = null;
   let currentGhostEl = null;
   let firstPromptUsed = false;
 
@@ -552,14 +565,20 @@
     }
   }
 
+  // Returns whether the upload landed. Never throws — callers that are about
+  // to discard local state (switchNotepad) have to be able to tell.
   async function pushCloud() {
-    if (!cryptoKey || !phraseId) return;
+    if (!cryptoKey || !phraseId) return false;
     setSyncStatus('pending', 'Saving…');
     try {
-      // Read hint from DOM at push time. The editor and hint inputs share
-      // autoSaveTimer, so a hint edit followed quickly by an editor edit can
-      // cancel the queued saveHint() — making the in-memory `hint` stale.
-      // Treat the element as the source of truth here.
+      // Read BOTH the page and the hint from the DOM at push time. The hint
+      // side dates from 2026-05-06; the editor side was the same bug and
+      // stayed open until 2026-09-18, when a hint edit within 1s of an editor
+      // edit could still cancel the only thing that copies editor.innerHTML
+      // into `pages`. This is also what makes flushNow() correct — it pushes
+      // without going through savePage at all — so keep the read here even
+      // though the split timers now close the original race on their own.
+      pages[currentPage] = cleanForSave(editor.innerHTML);
       hint = readHintFromEl(hintEl);
       const blob = await encryptJSON(cryptoKey, { pages, currentPage, hint });
       const { error } = await supabase.from('notes').upsert({
@@ -569,11 +588,13 @@
       });
       if (error) {
         setSyncStatus('error', "Cloud's not picking up");
-        return;
+        return false;
       }
       setSyncStatus('ok', 'Synced');
+      return true;
     } catch {
       setSyncStatus('error', "Cloud's not picking up");
+      return false;
     }
   }
 
@@ -729,22 +750,22 @@
   function updateGhost() {
     clearGhost();
     if (!cryptoKey) return;
+    // htmlIsBlank, not `children.length === 0`: type without pressing Enter,
+    // then select-all and delete, and the browser leaves a bare <br> as a
+    // direct child. The old guard read that as content, so the page looked
+    // empty and showed no prompt for the rest of the session.
+    const blank = htmlIsBlank(editor.innerHTML);
     if (document.activeElement !== editor) {
       // When unfocused, still show a ghost on a wholly-empty editor so the
       // user sees the prompt before they click in.
-      if (!editor.textContent || editor.textContent.length === 0) {
-        if (editor.children.length === 0) {
-          editor.setAttribute('data-placeholder', ghostCopyForLine(null));
-        }
-      }
+      if (blank) editor.setAttribute('data-placeholder', ghostCopyForLine(null));
       return;
     }
     const block = findCurrentBlock();
     if (block && blockIsEmpty(block)) {
       block.setAttribute('data-placeholder', ghostCopyForLine(block));
       currentGhostEl = block;
-    } else if (!block && editor.children.length === 0 &&
-               (!editor.textContent || editor.textContent.length === 0)) {
+    } else if (!block && blank) {
       // No nested blocks yet — the editor itself is the empty line.
       editor.setAttribute('data-placeholder', ghostCopyForLine(null));
     }
@@ -808,11 +829,13 @@
 
   async function switchNotepad() {
     if (cryptoKey) {
-      clearTimeout(autoSaveTimer);
-      clearTimeout(pushTimer);
-      pages[currentPage] = cleanForSave(editor.innerHTML);
-      hint = readHintFromEl(hintEl);
-      try { await pushCloud(); } catch {}
+      cancelPending();
+      // pushCloud reads the page and hint from the DOM itself, and reports
+      // instead of throwing. Tearing down on a failed save discards the page
+      // for good — and on the phone .sync-status is display:none, so the
+      // warning can't ride on the status chip.
+      const saved = await pushCloud();
+      if (!saved && !confirm("Didn't save. Leave anyway?")) return;
     }
     cryptoKey = null;
     phraseId = null;
@@ -820,6 +843,12 @@
     currentPage = 1;
     hint = '';
     hintEl.textContent = '';
+    // State alone isn't enough: the decrypted note stays live in the DOM,
+    // readable on the lock screen, until the editor is actually emptied.
+    editor.innerHTML = '';
+    clearGhost();
+    updateWordCount();
+    updateUI();
     appHeader.hidden = true;
     appContainer.hidden = true;
     appFooter.hidden = true;
@@ -861,12 +890,21 @@
     if (editor.textContent && editor.textContent.length > 0) firstPromptUsed = true;
     updateWordCount();
     updateGhost();
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(savePage, 1000);
+    // Deliberately NOT a restarting debounce: one that resets on every
+    // keystroke never fires at all while the user types without a 1s gap, so
+    // an unbroken burst was entirely unpersisted. Leaving a pending save
+    // alone caps the exposure at 1s from the first unsaved keystroke.
+    if (editorSaveTimer === null) {
+      editorSaveTimer = setTimeout(() => { editorSaveTimer = null; savePage(); }, 1000);
+    }
   });
 
   editor.addEventListener('focus', updateGhost);
-  editor.addEventListener('blur', clearGhost);
+  // updateGhost, not clearGhost: clearGhost only removes the attribute, so
+  // clicking out of an empty editor killed the prompt in a state that had
+  // been showing it a moment earlier. updateGhost clears first, then takes
+  // the unfocused branch.
+  editor.addEventListener('blur', updateGhost);
   document.addEventListener('selectionchange', () => {
     if (document.activeElement === editor) updateGhost();
   });
@@ -877,8 +915,8 @@
   }
 
   hintEl.addEventListener('input', () => {
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(saveHint, 1000);
+    clearTimeout(hintSaveTimer);
+    hintSaveTimer = setTimeout(saveHint, 1000);
   });
 
   hintEl.addEventListener('keydown', e => {
@@ -911,6 +949,30 @@
   });
 
   window.addEventListener('online', () => { if (cryptoKey) queuePush(); });
+
+  function cancelPending() {
+    clearTimeout(editorSaveTimer);
+    clearTimeout(hintSaveTimer);
+    clearTimeout(pushTimer);
+    editorSaveTimer = hintSaveTimer = pushTimer = null;
+  }
+
+  // The cloud is the only copy — v5 removed every local write — and a
+  // backgrounded PWA doesn't get to run its timers. Waiting out the two 1s
+  // debounces loses up to 2s of writing every time the app is dismissed, so
+  // flush on the way out. pushCloud reads the page and hint from the DOM, so
+  // there's nothing to capture first.
+  function flushNow() {
+    if (!cryptoKey) return;
+    cancelPending();
+    pushCloud();
+  }
+
+  // visibilitychange is the reliable signal on iOS; pagehide covers unload.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushNow();
+  });
+  window.addEventListener('pagehide', flushNow);
 </script>
 
 </body>
